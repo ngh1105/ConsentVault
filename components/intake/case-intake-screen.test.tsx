@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CaseIntakeScreen } from "@/components/intake/case-intake-screen";
@@ -86,6 +86,32 @@ describe("CaseIntakeScreen", () => {
       }),
     });
     expect(push).toHaveBeenCalledWith(`/cases/${routedCaseId}`);
+  });
+
+  it("shows unsupported source urls as warning text in the live evidence preview", async () => {
+    const push = vi.fn();
+    const dispatch = vi.fn();
+    const user = userEvent.setup();
+
+    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseConsentVault.mockReturnValue({
+      dispatch,
+      policies: samplePolicies,
+    } as ReturnType<typeof useConsentVault>);
+
+    render(<CaseIntakeScreen />);
+
+    await user.type(screen.getByLabelText(/Suspicious content title/i), "Voice clone dispute");
+    await user.type(screen.getByLabelText(/Original source URL/i), "javascript:alert(1)");
+
+    const sourceCard = screen.getByText("Voice clone dispute source record").closest("article");
+
+    expect(sourceCard).not.toBeNull();
+    expect(
+      within(sourceCard as HTMLElement).queryByRole("link", { name: /Open source/i }),
+    ).not.toBeInTheDocument();
+    expect(within(sourceCard as HTMLElement).getByText("javascript:alert(1)")).toBeVisible();
+    expect(within(sourceCard as HTMLElement).getByText(/Invalid or unsupported URL/i)).toBeVisible();
   });
 
   it("ignores repeat submissions while the first navigation is still in progress", async () => {

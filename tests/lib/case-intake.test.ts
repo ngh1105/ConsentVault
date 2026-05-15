@@ -1,7 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { buildEvidenceBundlePreview } from "@/lib/case-intake";
+import { assessExternalUrl, buildEvidenceBundlePreview } from "@/lib/case-intake";
 
 describe("buildEvidenceBundlePreview", () => {
+  it("classifies external urls as empty, invalid, or allowed", () => {
+    expect(assessExternalUrl("   ")).toEqual({
+      raw: "",
+      normalized: "",
+      href: "",
+      status: "empty",
+    });
+
+    expect(assessExternalUrl(" javascript:alert(1) ")).toEqual({
+      raw: "javascript:alert(1)",
+      normalized: "",
+      href: "",
+      status: "invalid",
+    });
+
+    expect(assessExternalUrl(" HTTPS://Creator.Example/source ")).toEqual({
+      raw: "HTTPS://Creator.Example/source",
+      normalized: "https://creator.example/source",
+      href: "https://creator.example/source",
+      status: "valid",
+    });
+  });
+
   it("turns intake fields into source, output, and platform evidence cards", () => {
     const bundle = buildEvidenceBundlePreview({
       title: "Voice clone dispute",
@@ -58,6 +81,7 @@ describe("buildEvidenceBundlePreview", () => {
         type: "source",
         title: "Voice clone dispute source record",
         url: "https://creator.example/source",
+        previewUrlText: undefined,
         description: "Original creator source gathered for Voice clone dispute. Suspicious synthetic voice reuse",
         capturedAt: "voice-clone-dispute-source-captured",
       },
@@ -66,6 +90,7 @@ describe("buildEvidenceBundlePreview", () => {
         type: "output",
         title: "Voice clone dispute AI output",
         url: "https://platform.example/output",
+        previewUrlText: undefined,
         description: "AI-generated output gathered for Voice clone dispute. Suspicious synthetic voice reuse",
         capturedAt: "voice-clone-dispute-output-captured",
       },
@@ -74,13 +99,14 @@ describe("buildEvidenceBundlePreview", () => {
         type: "platform",
         title: "Voice clone dispute platform listing",
         url: "https://platform.example/post",
+        previewUrlText: undefined,
         description: "Platform listing gathered for Voice clone dispute. Suspicious synthetic voice reuse",
         capturedAt: "voice-clone-dispute-platform-captured",
       },
     ]);
   });
 
-  it("clears disallowed url schemes from the evidence preview", () => {
+  it("clears disallowed url schemes from the evidence preview url fields", () => {
     const bundle = buildEvidenceBundlePreview({
       title: "Voice clone dispute",
       sourceUrl: " javascript:alert(1) ",
@@ -92,12 +118,15 @@ describe("buildEvidenceBundlePreview", () => {
     expect(bundle).toMatchObject([
       {
         url: "",
+        previewUrlText: "javascript:alert(1)",
       },
       {
         url: "",
+        previewUrlText: "data:text/html,boom",
       },
       {
         url: "",
+        previewUrlText: "mailto:review@example.com",
       },
     ]);
   });
@@ -122,5 +151,8 @@ describe("buildEvidenceBundlePreview", () => {
         url: "https://platform.example/post#fragment",
       },
     ]);
+    expect(bundle[0]).not.toHaveProperty("previewUrlText");
+    expect(bundle[1]).not.toHaveProperty("previewUrlText");
+    expect(bundle[2]).not.toHaveProperty("previewUrlText");
   });
 });

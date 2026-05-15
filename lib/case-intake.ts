@@ -15,6 +15,19 @@ export interface PreparedIntakeCaseSubmission extends IntakeSubmission {
   evidenceItems: EvidenceItem[];
 }
 
+export type ExternalUrlStatus = "empty" | "invalid" | "valid";
+
+export interface ExternalUrlAssessment {
+  raw: string;
+  normalized: string;
+  href: string;
+  status: ExternalUrlStatus;
+}
+
+export interface EvidencePreviewItem extends EvidenceItem {
+  previewUrlText?: string;
+}
+
 const DEFAULT_TITLE = "Untitled dispute";
 const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:"]);
 
@@ -26,24 +39,50 @@ function normalizeTitle(title: string): string {
   return trimText(title) || DEFAULT_TITLE;
 }
 
-function normalizeExternalUrl(url: string): string {
-  const trimmedUrl = trimText(url);
+export function assessExternalUrl(url: string): ExternalUrlAssessment {
+  const raw = trimText(url);
 
-  if (!trimmedUrl) {
-    return "";
+  if (!raw) {
+    return {
+      raw: "",
+      normalized: "",
+      href: "",
+      status: "empty",
+    };
   }
 
   try {
-    const parsedUrl = new URL(trimmedUrl);
+    const parsedUrl = new URL(raw);
 
     if (!ALLOWED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return "";
+      return {
+        raw,
+        normalized: "",
+        href: "",
+        status: "invalid",
+      };
     }
 
-    return parsedUrl.toString();
+    const normalized = parsedUrl.toString();
+
+    return {
+      raw,
+      normalized,
+      href: normalized,
+      status: "valid",
+    };
   } catch {
-    return "";
+    return {
+      raw,
+      normalized: "",
+      href: "",
+      status: "invalid",
+    };
   }
+}
+
+function normalizeExternalUrl(url: string): string {
+  return assessExternalUrl(url).normalized;
 }
 
 function slugify(value: string): string {
@@ -57,6 +96,32 @@ function buildDescription(base: string, title: string, notes: string): string {
   return notes ? `${base} for ${title}. ${notes}` : `${base} for ${title}.`;
 }
 
+function buildPreviewUrlText(assessment: ExternalUrlAssessment): string | undefined {
+  return assessment.status === "invalid" ? assessment.raw : undefined;
+}
+
+function buildPreviewEvidenceItem(args: {
+  id: string;
+  type: EvidenceItem["type"];
+  title: string;
+  urlInput: string;
+  description: string;
+  capturedAt: string;
+}): EvidencePreviewItem {
+  const urlAssessment = assessExternalUrl(args.urlInput);
+  const previewUrlText = buildPreviewUrlText(urlAssessment);
+
+  return {
+    id: args.id,
+    type: args.type,
+    title: args.title,
+    url: urlAssessment.normalized,
+    ...(previewUrlText ? { previewUrlText } : {}),
+    description: args.description,
+    capturedAt: args.capturedAt,
+  };
+}
+
 export function normalizeIntakeSubmission(submission: IntakeSubmission): IntakeSubmission {
   return {
     title: normalizeTitle(submission.title),
@@ -67,35 +132,36 @@ export function normalizeIntakeSubmission(submission: IntakeSubmission): IntakeS
   };
 }
 
-export function buildEvidenceBundlePreview(submission: IntakeSubmission): EvidenceItem[] {
-  const normalized = normalizeIntakeSubmission(submission);
-  const titleSlug = slugify(normalized.title);
+export function buildEvidenceBundlePreview(submission: IntakeSubmission): EvidencePreviewItem[] {
+  const normalizedTitle = normalizeTitle(submission.title);
+  const normalizedNotes = trimText(submission.notes);
+  const titleSlug = slugify(normalizedTitle);
 
   return [
-    {
+    buildPreviewEvidenceItem({
       id: `${titleSlug}-source`,
       type: "source",
-      title: `${normalized.title} source record`,
-      url: normalized.sourceUrl,
-      description: buildDescription("Original creator source gathered", normalized.title, normalized.notes),
+      title: `${normalizedTitle} source record`,
+      urlInput: submission.sourceUrl,
+      description: buildDescription("Original creator source gathered", normalizedTitle, normalizedNotes),
       capturedAt: `${titleSlug}-source-captured`,
-    },
-    {
+    }),
+    buildPreviewEvidenceItem({
       id: `${titleSlug}-output`,
       type: "output",
-      title: `${normalized.title} AI output`,
-      url: normalized.aiOutputUrl,
-      description: buildDescription("AI-generated output gathered", normalized.title, normalized.notes),
+      title: `${normalizedTitle} AI output`,
+      urlInput: submission.aiOutputUrl,
+      description: buildDescription("AI-generated output gathered", normalizedTitle, normalizedNotes),
       capturedAt: `${titleSlug}-output-captured`,
-    },
-    {
+    }),
+    buildPreviewEvidenceItem({
       id: `${titleSlug}-platform`,
       type: "platform",
-      title: `${normalized.title} platform listing`,
-      url: normalized.platformUrl,
-      description: buildDescription("Platform listing gathered", normalized.title, normalized.notes),
+      title: `${normalizedTitle} platform listing`,
+      urlInput: submission.platformUrl,
+      description: buildDescription("Platform listing gathered", normalizedTitle, normalizedNotes),
       capturedAt: `${titleSlug}-platform-captured`,
-    },
+    }),
   ];
 }
 
@@ -105,12 +171,22 @@ export function buildPreparedIntakeCaseSubmission(
 ): PreparedIntakeCaseSubmission {
   const normalized = normalizeIntakeSubmission(submission);
   const titleSlug = slugify(normalized.title);
+  const evidenceItems = buildEvidenceBundlePreview(normalized).map((item) => {
+    if (!("previewUrlText" in item)) {
+      return item;
+    }
+
+    const safeItem = { ...item };
+    delete safeItem.previewUrlText;
+
+    return safeItem;
+  });
 
   return {
     ...normalized,
     policyId: submission.policyId,
     id: options?.id ?? `case-${titleSlug}-${Date.now()}`,
     createdAt: options?.createdAt ?? new Date().toISOString(),
-    evidenceItems: buildEvidenceBundlePreview(normalized),
+    evidenceItems,
   };
 }

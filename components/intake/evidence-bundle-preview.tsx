@@ -1,45 +1,9 @@
 import { AlertTriangle, ExternalLink, FileArchive } from "lucide-react";
-import type { EvidenceItem } from "@/lib/domain";
+import { assessExternalUrl, type EvidencePreviewItem } from "@/lib/case-intake";
 
 type EvidenceBundlePreviewProps = {
-  items: EvidenceItem[];
+  items: EvidencePreviewItem[];
 };
-
-const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:"]);
-
-function getPreviewUrlState(url: string) {
-  if (!url) {
-    return {
-      href: "",
-      isAllowed: false,
-      isInvalid: false,
-    };
-  }
-
-  try {
-    const parsedUrl = new URL(url);
-
-    if (!ALLOWED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return {
-        href: "",
-        isAllowed: false,
-        isInvalid: true,
-      };
-    }
-
-    return {
-      href: parsedUrl.toString(),
-      isAllowed: true,
-      isInvalid: false,
-    };
-  } catch {
-    return {
-      href: "",
-      isAllowed: false,
-      isInvalid: true,
-    };
-  }
-}
 
 export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
   const hasExactPreviewCount = items.length === 3;
@@ -65,7 +29,8 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => {
-          const previewUrl = getPreviewUrlState(item.url);
+          const previewText = item.previewUrlText ?? item.url;
+          const previewUrl = assessExternalUrl(previewText);
 
           return (
             <article
@@ -86,14 +51,14 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
 
               <p className="mt-4 text-sm leading-6 text-foreground">{item.description}</p>
               <p
-                className={previewUrl.isInvalid
+                className={previewUrl.status === "invalid"
                   ? "mt-4 break-all rounded-[1rem] border border-amber-700/15 bg-amber-600/10 px-3 py-2 text-sm leading-6 text-amber-900"
                   : "mt-4 break-all text-sm leading-6 text-muted-foreground"}
               >
-                {item.url || "URL pending"}
+                {previewText || "URL pending"}
               </p>
 
-              {previewUrl.isAllowed ? (
+              {previewUrl.status === "valid" ? (
                 <a
                   href={previewUrl.href}
                   target="_blank"
@@ -105,7 +70,7 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
                 </a>
               ) : null}
 
-              {previewUrl.isInvalid ? (
+              {previewUrl.status === "invalid" ? (
                 <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-amber-900">
                   <AlertTriangle className="h-4 w-4" aria-hidden="true" />
                   Invalid or unsupported URL
