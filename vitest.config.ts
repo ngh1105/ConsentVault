@@ -5,7 +5,12 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
-    exclude: [...configDefaults.exclude, "**/.claude/**", "**/.next/**"],
+    exclude: [
+      ...configDefaults.exclude,
+      "**/.claude/**",
+      "**/.next/**",
+      "tests/e2e/**",
+    ],
   },
   resolve: {
     alias: {

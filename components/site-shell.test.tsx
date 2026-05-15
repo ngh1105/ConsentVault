@@ -3,24 +3,28 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const siteShellSource = readFileSync(resolve(__dirname, "site-shell.tsx"), "utf8");
+const navigationSource = readFileSync(resolve(__dirname, "navigation.tsx"), "utf8");
 const homePageSource = readFileSync(resolve(__dirname, "../app/page.tsx"), "utf8");
+const caseOverviewSource = readFileSync(
+  resolve(__dirname, "./cases/case-overview.tsx"),
+  "utf8",
+);
 
-describe("Task 1 scaffold shell", () => {
-  it("renders primary navigation semantically and keeps demo sidebar content out of the shell", () => {
-    expect(siteShellSource).toContain('<nav aria-label="Primary"');
-    expect(siteShellSource).toContain("<ul");
-    expect(siteShellSource).toContain("<li");
-    expect(siteShellSource).not.toContain("Sample disputes loaded");
-    expect(siteShellSource).not.toContain("Task 2 will replace");
-    expect(homePageSource).toContain("Sample disputes loaded");
+describe("dashboard shell and case overview", () => {
+  it("renders primary navigation with real workflow destinations", () => {
+    expect(siteShellSource).toContain("<Navigation />");
+    expect(navigationSource).toContain('<nav aria-label="Primary"');
+    expect(navigationSource).toContain('href: "/"');
+    expect(navigationSource).toContain('href: "/policy"');
+    expect(navigationSource).toContain('href: "/cases/new"');
+    expect(siteShellSource).toContain('href="/cases/new"');
   });
 
-  it("keeps unavailable scaffold actions non-navigable until their routes exist", () => {
-    expect(siteShellSource).not.toContain('href="/cases/new"');
-    expect(siteShellSource).not.toContain('href="/policy"');
-    expect(homePageSource).not.toContain('href="/cases/new"');
-    expect(homePageSource).not.toContain('href="/policy"');
-    expect(siteShellSource).toContain("Available in a later task");
-    expect(homePageSource).toContain("Available in a later task");
+  it("wires the home page to the real dashboard screen and case overview links", () => {
+    expect(homePageSource).toContain("<DashboardScreen />");
+    expect(homePageSource).not.toContain("Task 1 scaffold");
+    expect(caseOverviewSource).toContain('href={`/cases/${consentCase.id}/evidence`}');
+    expect(caseOverviewSource).toContain('href={`/cases/${consentCase.id}/trial`}');
+    expect(caseOverviewSource).toContain('href={`/cases/${consentCase.id}/receipt`}');
   });
 });
