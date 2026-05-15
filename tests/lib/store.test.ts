@@ -73,6 +73,7 @@ describe("consentVaultReducer", () => {
         },
       ],
     });
+    expect(next.activeCaseId).toBe("case-voice-clone-dispute");
   });
 
   it("marks the matching case verdict ready when saving a receipt", () => {

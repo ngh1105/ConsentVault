@@ -69,14 +69,17 @@ export function CaseIntakeScreen() {
   const handleSubmit = () => {
     setIsSubmitting(true);
 
-    const preparedSubmission = buildPreparedIntakeCaseSubmission(values);
+    const caseId = `case-${Date.now()}`;
+    const preparedSubmission = buildPreparedIntakeCaseSubmission(values, {
+      id: caseId,
+    });
     dispatch({
       type: "case/create",
       payload: preparedSubmission,
     });
 
     setIsSubmitting(false);
-    router.push(`/cases/${preparedSubmission.id}`);
+    router.push(`/cases/${caseId}`);
   };
 
   return (

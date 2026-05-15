@@ -1,0 +1,90 @@
+import React from "react";
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { CaseIntakeScreen } from "@/components/intake/case-intake-screen";
+import { useConsentVault } from "@/components/providers/consent-vault-provider";
+import { samplePolicies } from "@/lib/sample-data";
+import * as caseIntake from "@/lib/case-intake";
+import { useRouter } from "next/navigation";
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(),
+}));
+
+vi.mock("@/components/providers/consent-vault-provider", () => ({
+  useConsentVault: vi.fn(),
+}));
+
+vi.mock("@/lib/case-intake", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/case-intake")>();
+
+  return {
+    ...actual,
+    buildPreparedIntakeCaseSubmission: vi.fn(actual.buildPreparedIntakeCaseSubmission),
+  };
+});
+
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedUseConsentVault = vi.mocked(useConsentVault);
+const mockedBuildPreparedIntakeCaseSubmission = vi.mocked(
+  caseIntake.buildPreparedIntakeCaseSubmission,
+);
+
+afterEach(() => {
+  cleanup();
+  mockedUseRouter.mockReset();
+  mockedUseConsentVault.mockReset();
+  mockedBuildPreparedIntakeCaseSubmission.mockClear();
+});
+
+describe("CaseIntakeScreen", () => {
+  it("prepares an explicit case id before dispatch and routes to the same case overview", async () => {
+    const push = vi.fn();
+    const dispatch = vi.fn();
+    const user = userEvent.setup();
+
+    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseConsentVault.mockReturnValue({
+      dispatch,
+      policies: samplePolicies,
+    } as ReturnType<typeof useConsentVault>);
+
+    render(<CaseIntakeScreen />);
+
+    await user.type(screen.getByLabelText(/Suspicious content title/i), "Voice clone dispute");
+    await user.type(screen.getByLabelText(/Original source URL/i), "https://creator.example/source");
+    await user.type(screen.getByLabelText(/AI output URL/i), "https://platform.example/output");
+    await user.type(screen.getByLabelText(/^Platform URL$/i), "https://platform.example/post");
+    await user.type(screen.getByLabelText(/Intake notes/i), "Suspicious synthetic voice reuse");
+    await user.click(screen.getByRole("button", { name: /Open draft case/i }));
+
+    expect(mockedBuildPreparedIntakeCaseSubmission).toHaveBeenCalledTimes(1);
+
+    const [submittedValues, options] = mockedBuildPreparedIntakeCaseSubmission.mock.calls[0];
+
+    expect(submittedValues).toMatchObject({
+      title: "Voice clone dispute",
+      sourceUrl: "https://creator.example/source",
+      aiOutputUrl: "https://platform.example/output",
+      platformUrl: "https://platform.example/post",
+      notes: "Suspicious synthetic voice reuse",
+      policyId: samplePolicies[0].id,
+    });
+    expect(options).toEqual(
+      expect.objectContaining({
+        id: expect.stringMatching(/^case-/),
+      }),
+    );
+
+    const routedCaseId = options?.id;
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "case/create",
+      payload: expect.objectContaining({
+        id: routedCaseId,
+      }),
+    });
+    expect(push).toHaveBeenCalledWith(`/cases/${routedCaseId}`);
+  });
+});

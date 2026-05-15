@@ -6,6 +6,9 @@ type EvidenceBundlePreviewProps = {
 };
 
 export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
+  const hasExactPreviewCount = items.length === 3;
+  const isEmpty = items.length === 0;
+
   return (
     <section className="evidence-card p-6">
       <div className="flex items-center gap-3">
@@ -16,8 +19,16 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
         </div>
       </div>
 
+      {!hasExactPreviewCount ? (
+        <div className="mt-6 rounded-[1.2rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm leading-6 text-foreground">
+          {isEmpty
+            ? "No evidence records are available yet. Add the source, AI output, and platform listing to restore the three-card preview."
+            : `Expected exactly 3 evidence records before filing, but received ${items.length}.`}
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-4">
-        {items.slice(0, 3).map((item) => (
+        {items.map((item) => (
           <article
             key={item.id}
             className="rounded-[1.45rem] border border-border/80 bg-background/70 p-5"
