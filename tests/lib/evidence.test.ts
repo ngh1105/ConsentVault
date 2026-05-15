@@ -4,13 +4,14 @@ import { matchPolicyClauses } from "@/lib/evidence";
 import { sampleCases, samplePolicies } from "@/lib/sample-data";
 
 describe("matchPolicyClauses", () => {
-  it("returns the blocked clauses that match the selected case", () => {
-    const matches = matchPolicyClauses(sampleCases[0], samplePolicies[0]);
-    expect(matches).toContain("impersonation");
-    expect(matches).not.toContain("commercial remix");
+  it("returns each matching blocked-use clause from the policy without collapsing them", () => {
+    expect(matchPolicyClauses(sampleCases[0], samplePolicies[0])).toEqual([
+      "Voice cloning for ads or endorsements",
+      "Synthetic avatars that imitate the creator's likeness",
+    ]);
   });
 
-  it("matches clauses case-insensitively", () => {
+  it("returns the original blocked-use clause when matching case-insensitively", () => {
     const consentCase: ConsentCase = {
       id: "case-uppercase",
       title: "Celebrity IMPERSONATION complaint",
@@ -40,17 +41,17 @@ describe("matchPolicyClauses", () => {
       creatorName: "Archive Creator",
       creatorHandle: "@archivecreator",
       allowedUses: [],
-      blockedUses: ["impersonation", "voice cloning"],
+      blockedUses: ["Impersonation"],
       attributionRules: "",
       licenseRules: "",
       jurisdictionNote: "",
       createdAt: "2026-05-15T09:00:00.000Z",
     };
 
-    expect(matchPolicyClauses(consentCase, policy)).toEqual(["impersonation"]);
+    expect(matchPolicyClauses(consentCase, policy)).toEqual(["Impersonation"]);
   });
 
-  it("returns unique matches even when the same clause appears multiple times", () => {
+  it("returns unique blocked-use clauses even when the same policy clause appears multiple times", () => {
     const consentCase: ConsentCase = {
       id: "case-duplicates",
       title: "Dataset resale alert",

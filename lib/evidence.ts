@@ -133,11 +133,13 @@ function clauseMatchesCase(consentCase: ConsentCase, clause: string): boolean {
 }
 
 export function isBlockedClauseMatched(clause: string, matchedClauses: string[]): boolean {
-  const normalizedMatches = new Set(matchedClauses.map((item) => normalizeText(item)));
-  return (
-    normalizedMatches.has(normalizeText(clause)) ||
-    normalizedMatches.has(summarizeBlockedClause(clause))
-  );
+  const normalizedClause = normalizeText(clause);
+  const normalizedSummary = summarizeBlockedClause(clause);
+
+  return matchedClauses.some((item) => {
+    const normalizedMatch = normalizeText(item);
+    return normalizedMatch === normalizedClause || summarizeBlockedClause(item) === normalizedSummary;
+  });
 }
 
 export function matchPolicyClauses(consentCase: ConsentCase, policy: ConsentPolicy): string[] {
@@ -148,7 +150,7 @@ export function matchPolicyClauses(consentCase: ConsentCase, policy: ConsentPoli
       continue;
     }
 
-    matches.add(summarizeBlockedClause(clause));
+    matches.add(clause);
   }
 
   return Array.from(matches);
