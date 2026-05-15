@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ArrowRight, BadgeCheck, FileSearch, Landmark, Scale, ShieldAlert } from "lucide-react";
+import { ArrowRight, BadgeCheck, FileSearch, FileStack, Landmark, Scale, ShieldAlert } from "lucide-react";
 
 const sampleCases = [
   {
@@ -44,7 +43,9 @@ const workflowSignals = [
     description: "Simulate a multi-validator decision and export a shareable receipt.",
     icon: Scale,
   },
-];
+] as const;
+
+const unavailableLabel = "Available in a later task";
 
 export default function HomePage() {
   return (
@@ -64,39 +65,71 @@ export default function HomePage() {
             The landing shell establishes the parchment-and-ink identity for ConsentVault and previews the creator workflow: capture consent terms, file a suspicious output, compare evidence, and issue a scarlet verdict receipt.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/cases/new"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground transition hover:-translate-y-0.5 hover:bg-accent/90"
+            <button
+              type="button"
+              disabled
+              aria-label={`Create case (${unavailableLabel.toLowerCase()})`}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground opacity-60"
             >
               Create case
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/policy"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-card/70 px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:text-accent"
+            </button>
+            <button
+              type="button"
+              disabled
+              aria-label={`Review policy shell (${unavailableLabel.toLowerCase()})`}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-card/70 px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground opacity-60"
             >
               Review policy shell
-            </Link>
+            </button>
           </div>
+          <p className="mt-3 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+            {unavailableLabel}
+          </p>
         </article>
 
-        <aside className="evidence-card p-6">
-          <p className="metadata-label">Workflow frame</p>
-          <div className="mt-5 space-y-4">
-            {workflowSignals.map(({ title, description, icon: Icon }) => (
-              <div key={title} className="rounded-[1.4rem] border border-ink/10 bg-background/55 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 rounded-full border border-accent/15 bg-accent/10 p-2 text-accent">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-2xl">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+        <aside className="space-y-4">
+          <section className="evidence-card p-6">
+            <p className="metadata-label">Workflow frame</p>
+            <div className="mt-5 space-y-4">
+              {workflowSignals.map(({ title, description, icon: Icon }) => (
+                <div key={title} className="rounded-[1.4rem] border border-ink/10 bg-background/55 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 rounded-full border border-accent/15 bg-accent/10 p-2 text-accent">
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-2xl">{title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="evidence-card p-6">
+            <p className="metadata-label">Current docket</p>
+            <div className="mt-4 space-y-4">
+              <div className="rounded-[1.5rem] border border-accent/15 bg-accent/6 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-display text-2xl">04</span>
+                  <FileStack className="h-5 w-5 text-accent" aria-hidden="true" />
+                </div>
+                <p className="mt-3 font-mono text-[0.7rem] uppercase tracking-[0.24em] text-muted-foreground">
+                  Sample disputes loaded
+                </p>
               </div>
-            ))}
-          </div>
+              <div className="space-y-3 text-sm leading-6 text-muted-foreground">
+                <p>
+                  The shell already carries the archive look-and-feel Task 1 needs: parchment surfaces, scarlet verdict accents, and mono metadata labels.
+                </p>
+                <p>
+                  Task 2 will replace the temporary provider with a persistent consent ledger and live selectors.
+                </p>
+              </div>
+            </div>
+          </section>
         </aside>
       </section>
 
