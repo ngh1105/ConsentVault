@@ -73,8 +73,8 @@ export function PolicyForm({
           Allowed uses
         </span>
         <textarea
-          value={typeof draft.allowedUses === "string" ? draft.allowedUses : draft.allowedUses.join(", ")}
-          onChange={(event) => onFieldChange("allowedUses", event.target.value)}
+          value={draft.allowedUsesText}
+          onChange={(event) => onFieldChange("allowedUsesText", event.target.value)}
           className="min-h-28 w-full rounded-[1.4rem] border border-border/80 bg-background/70 px-4 py-3 text-sm leading-6 text-foreground"
           placeholder="Editorial commentary, classroom critique, safety benchmarking"
           aria-describedby="allowed-uses-hint"
@@ -86,17 +86,22 @@ export function PolicyForm({
 
       <div className="space-y-3">
         <div>
-          <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+          <p
+            id="blocked-uses-label"
+            className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground"
+          >
             Blocked uses
           </p>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          <p id="blocked-uses-hint" className="mt-2 text-sm leading-6 text-muted-foreground">
             Add restricted use clauses as tags. Separate multiple clauses with commas.
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <input
-            aria-label="Blocked use input"
+            id="blocked-uses-input"
+            aria-labelledby="blocked-uses-label"
+            aria-describedby="blocked-uses-hint"
             value={blockedUseInput}
             onChange={(event) => onBlockedUseInputChange(event.target.value)}
             onKeyDown={(event) => {

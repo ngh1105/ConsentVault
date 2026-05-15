@@ -36,7 +36,7 @@ describe("savePolicyDraft", () => {
     const draft: PolicyDraft = {
       creatorName: "  Mara Ellison  ",
       creatorHandle: "  @maraellison ",
-      allowedUses: " editorial commentary, private classroom critique, editorial commentary ",
+      allowedUsesText: " editorial commentary, private classroom critique, editorial commentary ",
       blockedUses: [" voice clone ", "Impersonation", "voice clone"],
       attributionRules: "  Credit the creator in the first line.  ",
       licenseRules: "  Commercial reuse needs approval.  ",

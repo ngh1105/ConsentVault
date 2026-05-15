@@ -3,8 +3,8 @@ import type { ConsentPolicy } from "@/lib/domain";
 export type PolicyDraft = {
   creatorName: string;
   creatorHandle: string;
-  allowedUses: string | string[];
-  blockedUses: string | string[];
+  allowedUsesText: string;
+  blockedUses: string[];
   attributionRules: string;
   licenseRules: string;
   jurisdictionNote: string;
@@ -43,7 +43,7 @@ export function savePolicyDraft(policy: ConsentPolicy, draft: PolicyDraft): Cons
     ...policy,
     creatorName: draft.creatorName.trim(),
     creatorHandle: draft.creatorHandle.trim(),
-    allowedUses: normalizePolicyClauses(draft.allowedUses),
+    allowedUses: normalizePolicyClauses(draft.allowedUsesText),
     blockedUses: normalizeBlockedUses(draft.blockedUses),
     attributionRules: draft.attributionRules.trim(),
     licenseRules: draft.licenseRules.trim(),

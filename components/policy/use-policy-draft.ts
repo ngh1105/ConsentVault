@@ -8,7 +8,7 @@ function createDraft(policy: ConsentPolicy | undefined): PolicyDraft {
   return {
     creatorName: policy?.creatorName ?? "",
     creatorHandle: policy?.creatorHandle ?? "",
-    allowedUses: policy?.allowedUses.join(", ") ?? "",
+    allowedUsesText: policy?.allowedUses.join(", ") ?? "",
     blockedUses: policy?.blockedUses ?? [],
     attributionRules: policy?.attributionRules ?? "",
     licenseRules: policy?.licenseRules ?? "",
