@@ -264,8 +264,8 @@ export const sampleJudgments: ValidatorJudgment[] = [
 export const sampleReceipt: VerdictReceipt = {
   id: "receipt-impersonation",
   caseId: impersonationCase.id,
-  finalVerdict: "Impersonation Risk",
-  score: 93,
+  finalVerdict: "Violation",
+  score: 95,
   summary: "Validators agreed that the synthetic ad strongly suggests unauthorized voice impersonation.",
   recommendedAction: "Escalate to platform trust and safety with evidence bundle and takedown request.",
   judgments: [impersonationJudgment, violationJudgment],
