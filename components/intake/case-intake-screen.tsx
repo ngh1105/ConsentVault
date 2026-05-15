@@ -66,20 +66,28 @@ export function CaseIntakeScreen() {
     setValues(createEmptyIntakeForm(selectedPolicy.id));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const caseId = `case-${Date.now()}`;
-    const preparedSubmission = buildPreparedIntakeCaseSubmission(values, {
-      id: caseId,
-    });
-    dispatch({
-      type: "case/create",
-      payload: preparedSubmission,
-    });
+    try {
+      const caseId = `case-${Date.now()}`;
+      const preparedSubmission = buildPreparedIntakeCaseSubmission(values, {
+        id: caseId,
+      });
+      dispatch({
+        type: "case/create",
+        payload: preparedSubmission,
+      });
 
-    setIsSubmitting(false);
-    router.push(`/cases/${caseId}`);
+      await router.push(`/cases/${caseId}`);
+    } catch (error) {
+      setIsSubmitting(false);
+      throw error;
+    }
   };
 
   return (

@@ -79,4 +79,48 @@ describe("buildEvidenceBundlePreview", () => {
       },
     ]);
   });
+
+  it("clears disallowed url schemes from the evidence preview", () => {
+    const bundle = buildEvidenceBundlePreview({
+      title: "Voice clone dispute",
+      sourceUrl: " javascript:alert(1) ",
+      aiOutputUrl: "data:text/html,boom",
+      platformUrl: "mailto:review@example.com",
+      notes: "Suspicious synthetic voice reuse",
+    });
+
+    expect(bundle).toMatchObject([
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+    ]);
+  });
+
+  it("preserves normalized http and https urls in the preview", () => {
+    const bundle = buildEvidenceBundlePreview({
+      title: "Voice clone dispute",
+      sourceUrl: "  HTTPS://Creator.Example/source  ",
+      aiOutputUrl: "http://platform.example/output",
+      platformUrl: " https://platform.example/post#fragment ",
+      notes: "Suspicious synthetic voice reuse",
+    });
+
+    expect(bundle).toMatchObject([
+      {
+        url: "https://creator.example/source",
+      },
+      {
+        url: "http://platform.example/output",
+      },
+      {
+        url: "https://platform.example/post#fragment",
+      },
+    ]);
+  });
 });

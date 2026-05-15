@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CaseIntakeScreen } from "@/components/intake/case-intake-screen";
@@ -87,4 +87,43 @@ describe("CaseIntakeScreen", () => {
     });
     expect(push).toHaveBeenCalledWith(`/cases/${routedCaseId}`);
   });
+
+  it("ignores repeat submissions while the first navigation is still in progress", async () => {
+    const dispatch = vi.fn();
+    const releaseNavigation: Array<() => void> = [];
+    const push = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseNavigation.push(resolve);
+        }),
+    );
+    const user = userEvent.setup();
+
+    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseConsentVault.mockReturnValue({
+      dispatch,
+      policies: samplePolicies,
+    } as ReturnType<typeof useConsentVault>);
+
+    render(<CaseIntakeScreen />);
+
+    await user.type(screen.getByLabelText(/Suspicious content title/i), "Voice clone dispute");
+    await user.type(screen.getByLabelText(/Original source URL/i), "https://creator.example/source");
+    await user.type(screen.getByLabelText(/AI output URL/i), "https://platform.example/output");
+    await user.type(screen.getByLabelText(/^Platform URL$/i), "https://platform.example/post");
+
+    const submitButton = screen.getByRole("button", { name: /Open draft case/i });
+    await user.dblClick(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Opening case/i })).toBeDisabled();
+    });
+
+    expect(mockedBuildPreparedIntakeCaseSubmission).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledTimes(1);
+
+    releaseNavigation.forEach((resolve) => resolve());
+  });
 });
+

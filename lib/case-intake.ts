@@ -16,6 +16,7 @@ export interface PreparedIntakeCaseSubmission extends IntakeSubmission {
 }
 
 const DEFAULT_TITLE = "Untitled dispute";
+const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:"]);
 
 function trimText(value: string): string {
   return value.trim();
@@ -23,6 +24,26 @@ function trimText(value: string): string {
 
 function normalizeTitle(title: string): string {
   return trimText(title) || DEFAULT_TITLE;
+}
+
+function normalizeExternalUrl(url: string): string {
+  const trimmedUrl = trimText(url);
+
+  if (!trimmedUrl) {
+    return "";
+  }
+
+  try {
+    const parsedUrl = new URL(trimmedUrl);
+
+    if (!ALLOWED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+      return "";
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return "";
+  }
 }
 
 function slugify(value: string): string {
@@ -39,9 +60,9 @@ function buildDescription(base: string, title: string, notes: string): string {
 export function normalizeIntakeSubmission(submission: IntakeSubmission): IntakeSubmission {
   return {
     title: normalizeTitle(submission.title),
-    sourceUrl: trimText(submission.sourceUrl),
-    aiOutputUrl: trimText(submission.aiOutputUrl),
-    platformUrl: trimText(submission.platformUrl),
+    sourceUrl: normalizeExternalUrl(submission.sourceUrl),
+    aiOutputUrl: normalizeExternalUrl(submission.aiOutputUrl),
+    platformUrl: normalizeExternalUrl(submission.platformUrl),
     notes: trimText(submission.notes),
   };
 }
