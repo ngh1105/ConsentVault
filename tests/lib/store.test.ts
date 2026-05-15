@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { sampleCases, samplePolicies, sampleReceipts } from "@/lib/sample-data";
 import { CONSENT_VAULT_STORAGE_KEY } from "@/lib/storage";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/lib/store";
 
 afterEach(() => {
+  vi.restoreAllMocks();
   cleanup();
   window.localStorage.clear();
 });
@@ -129,6 +130,72 @@ describe("ConsentVaultProvider persistence", () => {
       );
       expect(screen.getByTestId("active-case-id")).toHaveTextContent(sampleCases[0].id);
     });
+  });
+
+  it("falls back to seed state when localStorage.getItem throws", async () => {
+    const getItemSpy = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("storage disabled");
+      });
+
+    render(
+      React.createElement(
+        ConsentVaultProvider,
+        null,
+        React.createElement(ConsentVaultProbe),
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("policy-count")).toHaveTextContent(
+        String(samplePolicies.length),
+      );
+      expect(screen.getByTestId("case-count")).toHaveTextContent(String(sampleCases.length));
+      expect(screen.getByTestId("receipt-count")).toHaveTextContent(
+        String(sampleReceipts.length),
+      );
+      expect(screen.getByTestId("active-case-id")).toHaveTextContent(sampleCases[0].id);
+      expect(screen.getByTestId("first-case-title")).toHaveTextContent(sampleCases[0].title);
+    });
+
+    expect(getItemSpy).toHaveBeenCalledWith(CONSENT_VAULT_STORAGE_KEY);
+    getItemSpy.mockRestore();
+  });
+
+  it("does not crash when localStorage.setItem throws during persistence", async () => {
+    const setItemSpy = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("quota exceeded");
+      });
+
+    expect(() => {
+      render(
+        React.createElement(
+          ConsentVaultProvider,
+          null,
+          React.createElement(ConsentVaultProbe),
+        ),
+      );
+    }).not.toThrow();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("policy-count")).toHaveTextContent(
+        String(samplePolicies.length),
+      );
+      expect(screen.getByTestId("case-count")).toHaveTextContent(String(sampleCases.length));
+      expect(screen.getByTestId("receipt-count")).toHaveTextContent(
+        String(sampleReceipts.length),
+      );
+      expect(screen.getByTestId("active-case-id")).toHaveTextContent(sampleCases[0].id);
+    });
+
+    expect(setItemSpy).toHaveBeenCalledWith(
+      CONSENT_VAULT_STORAGE_KEY,
+      serializeConsentVaultState(createInitialConsentVaultState()),
+    );
+    setItemSpy.mockRestore();
   });
 
   it("hydrates valid persisted state into context", async () => {

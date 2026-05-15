@@ -20,7 +20,9 @@ import { sampleCases, samplePolicies, sampleReceipts } from "@/lib/sample-data";
 import {
   CONSENT_VAULT_STORAGE_KEY,
   safeParseConsentVaultState,
+  safeReadStorage,
   safeStringify,
+  safeWriteStorage,
 } from "@/lib/storage";
 
 export interface CaseSubmission {
@@ -85,11 +87,7 @@ export function deserializeConsentVaultState(value: string): ConsentVaultState {
 }
 
 function createInitialStateFromStorage(): ConsentVaultState {
-  if (typeof window === "undefined") {
-    return createInitialConsentVaultState();
-  }
-
-  const stored = window.localStorage.getItem(CONSENT_VAULT_STORAGE_KEY);
+  const stored = safeReadStorage(CONSENT_VAULT_STORAGE_KEY);
   return stored ? deserializeConsentVaultState(stored) : createInitialConsentVaultState();
 }
 
@@ -167,10 +165,7 @@ export function ConsentVaultProvider({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    window.localStorage.setItem(
-      CONSENT_VAULT_STORAGE_KEY,
-      serializeConsentVaultState(state),
-    );
+    safeWriteStorage(CONSENT_VAULT_STORAGE_KEY, serializeConsentVaultState(state));
   }, [state]);
 
   const value = useMemo<ConsentVaultContextValue>(() => {
