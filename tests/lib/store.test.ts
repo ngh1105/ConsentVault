@@ -1,11 +1,21 @@
-import { describe, expect, it } from "vitest";
+import * as React from "react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { sampleCases, samplePolicies, sampleReceipts } from "@/lib/sample-data";
+import { CONSENT_VAULT_STORAGE_KEY } from "@/lib/storage";
 import {
+  ConsentVaultProvider,
   consentVaultReducer,
   createInitialConsentVaultState,
   deserializeConsentVaultState,
   serializeConsentVaultState,
+  useConsentVault,
 } from "@/lib/store";
-import { sampleCases, sampleReceipts } from "@/lib/sample-data";
+
+afterEach(() => {
+  cleanup();
+  window.localStorage.clear();
+});
 
 describe("consentVaultReducer", () => {
   it("creates a draft case from an intake submission", () => {
@@ -55,5 +65,185 @@ describe("consentVaultReducer", () => {
   it("round-trips through JSON persistence", () => {
     const state = createInitialConsentVaultState();
     expect(deserializeConsentVaultState(serializeConsentVaultState(state))).toEqual(state);
+  });
+
+  it("falls back to seed state when persisted payload is a primitive", () => {
+    expect(deserializeConsentVaultState("42")).toEqual(createInitialConsentVaultState());
+  });
+
+  it("falls back to seed state when persisted payload omits required arrays", () => {
+    expect(deserializeConsentVaultState("{}")).toEqual(createInitialConsentVaultState());
+  });
+
+  it("falls back to seed state when persisted payload has invalid nested shapes", () => {
+    expect(
+      deserializeConsentVaultState(
+        JSON.stringify({
+          policies: samplePolicies,
+          cases: null,
+          receipts: sampleReceipts,
+          activeCaseId: sampleCases[0].id,
+        }),
+      ),
+    ).toEqual(createInitialConsentVaultState());
+  });
+});
+
+function ConsentVaultProbe() {
+  const { state } = useConsentVault();
+
+  return React.createElement(
+    React.Fragment,
+    null,
+    React.createElement("div", { "data-testid": "active-case-id" }, state.activeCaseId),
+    React.createElement("div", { "data-testid": "policy-count" }, String(state.policies.length)),
+    React.createElement("div", { "data-testid": "case-count" }, String(state.cases.length)),
+    React.createElement("div", { "data-testid": "receipt-count" }, String(state.receipts.length)),
+    React.createElement("div", { "data-testid": "first-case-title" }, state.cases[0]?.title ?? ""),
+  );
+}
+
+describe("ConsentVaultProvider persistence", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it("falls back safely when localStorage contains an invalid payload", async () => {
+    window.localStorage.setItem(CONSENT_VAULT_STORAGE_KEY, "42");
+
+    render(
+      React.createElement(
+        ConsentVaultProvider,
+        null,
+        React.createElement(ConsentVaultProbe),
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("policy-count")).toHaveTextContent(
+        String(samplePolicies.length),
+      );
+      expect(screen.getByTestId("case-count")).toHaveTextContent(String(sampleCases.length));
+      expect(screen.getByTestId("receipt-count")).toHaveTextContent(
+        String(sampleReceipts.length),
+      );
+      expect(screen.getByTestId("active-case-id")).toHaveTextContent(sampleCases[0].id);
+    });
+  });
+
+  it("hydrates valid persisted state into context", async () => {
+    const persisted = {
+      policies: [
+        {
+          ...samplePolicies[0],
+          id: "policy-persisted",
+          creatorName: "Persisted Creator",
+        },
+      ],
+      cases: [
+        {
+          ...sampleCases[0],
+          id: "case-persisted",
+          policyId: "policy-persisted",
+          title: "Persisted case title",
+          evidenceItems: [{ ...sampleCases[0].evidenceItems[0], id: "ev-persisted" }],
+        },
+      ],
+      receipts: [
+        {
+          ...sampleReceipts[0],
+          id: "receipt-persisted",
+          caseId: "case-persisted",
+          judgments: [
+            {
+              ...sampleReceipts[0].judgments[0],
+              id: "judgment-persisted",
+              citedEvidenceIds: ["ev-persisted"],
+            },
+          ],
+        },
+      ],
+      activeCaseId: "case-persisted",
+    };
+
+    window.localStorage.setItem(
+      CONSENT_VAULT_STORAGE_KEY,
+      JSON.stringify(persisted),
+    );
+
+    render(
+      React.createElement(
+        ConsentVaultProvider,
+        null,
+        React.createElement(ConsentVaultProbe),
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("policy-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("case-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("receipt-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("active-case-id")).toHaveTextContent("case-persisted");
+      expect(screen.getByTestId("first-case-title")).toHaveTextContent("Persisted case title");
+    });
+  });
+
+  it("does not overwrite persisted state with seed data on mount", async () => {
+    const persisted = {
+      policies: [
+        {
+          ...samplePolicies[0],
+          id: "policy-persisted-only",
+        },
+      ],
+      cases: [
+        {
+          ...sampleCases[0],
+          id: "case-persisted-only",
+          policyId: "policy-persisted-only",
+          title: "Persisted only case",
+          evidenceItems: [{ ...sampleCases[0].evidenceItems[0], id: "ev-persisted-only" }],
+        },
+      ],
+      receipts: [
+        {
+          ...sampleReceipts[0],
+          id: "receipt-persisted-only",
+          caseId: "case-persisted-only",
+          judgments: [
+            {
+              ...sampleReceipts[0].judgments[0],
+              id: "judgment-persisted-only",
+              citedEvidenceIds: ["ev-persisted-only"],
+            },
+          ],
+        },
+      ],
+      activeCaseId: "case-persisted-only",
+    };
+
+    window.localStorage.setItem(
+      CONSENT_VAULT_STORAGE_KEY,
+      JSON.stringify(persisted),
+    );
+
+    render(
+      React.createElement(
+        ConsentVaultProvider,
+        null,
+        React.createElement(ConsentVaultProbe),
+      ),
+    );
+
+    expect(
+      JSON.parse(window.localStorage.getItem(CONSENT_VAULT_STORAGE_KEY) ?? "null"),
+    ).toEqual(persisted);
+
+    await waitFor(() => {
+      expect(JSON.parse(window.localStorage.getItem(CONSENT_VAULT_STORAGE_KEY) ?? "null")).toEqual(
+        persisted,
+      );
+      expect(screen.getByTestId("first-case-title")).toHaveTextContent("Persisted only case");
+    });
   });
 });

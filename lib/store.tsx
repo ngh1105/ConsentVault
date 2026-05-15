@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   createContext,
   type Dispatch,
@@ -8,7 +9,6 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
 } from "react";
 import type {
   ConsentCase,
@@ -84,6 +84,15 @@ export function deserializeConsentVaultState(value: string): ConsentVaultState {
   return safeParseConsentVaultState(value) ?? createInitialConsentVaultState();
 }
 
+function createInitialStateFromStorage(): ConsentVaultState {
+  if (typeof window === "undefined") {
+    return createInitialConsentVaultState();
+  }
+
+  const stored = window.localStorage.getItem(CONSENT_VAULT_STORAGE_KEY);
+  return stored ? deserializeConsentVaultState(stored) : createInitialConsentVaultState();
+}
+
 export function consentVaultReducer(
   state: ConsentVaultState,
   action: ConsentVaultAction,
@@ -150,58 +159,14 @@ export function consentVaultReducer(
   }
 }
 
-function hydrateStateFromStorage(): ConsentVaultState {
-  if (typeof window === "undefined") {
-    return createInitialConsentVaultState();
-  }
-
-  const stored = window.localStorage.getItem(CONSENT_VAULT_STORAGE_KEY);
-  return stored ? deserializeConsentVaultState(stored) : createInitialConsentVaultState();
-}
-
 export function ConsentVaultProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(
     consentVaultReducer,
     undefined,
-    createInitialConsentVaultState,
+    createInitialStateFromStorage,
   );
-  const hasHydratedRef = useRef(false);
 
   useEffect(() => {
-    if (hasHydratedRef.current) {
-      return;
-    }
-
-    const hydratedState = hydrateStateFromStorage();
-    hasHydratedRef.current = true;
-
-    if (serializeConsentVaultState(hydratedState) === serializeConsentVaultState(state)) {
-      return;
-    }
-
-    dispatch({ type: "activeCase/set", payload: hydratedState.activeCaseId });
-    hydratedState.policies.forEach((policy) => {
-      dispatch({ type: "policy/save", payload: policy });
-    });
-    hydratedState.cases
-      .slice()
-      .reverse()
-      .forEach((consentCase) => {
-        dispatch({ type: "case/update", payload: consentCase });
-      });
-    hydratedState.receipts
-      .slice()
-      .reverse()
-      .forEach((receipt) => {
-        dispatch({ type: "receipt/save", payload: receipt });
-      });
-  }, [state]);
-
-  useEffect(() => {
-    if (!hasHydratedRef.current) {
-      return;
-    }
-
     window.localStorage.setItem(
       CONSENT_VAULT_STORAGE_KEY,
       serializeConsentVaultState(state),

@@ -100,7 +100,7 @@ export const impersonationCase: ConsentCase = {
 export const attributionCase: ConsentCase = {
   id: "case-attribution-gap",
   title: "Attribution omitted from recap clip",
-  status: "Verdict Ready",
+  status: "Draft",
   policyId: permissivePolicy.id,
   sourceUrl: "https://creator.example/jonah/thread",
   aiOutputUrl: "https://ai.example/outputs/recap-video",
