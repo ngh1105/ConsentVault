@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight, BadgeCheck, FileStack, ShieldAlert } from "lucide-react";
 import type { ConsentCase, ConsentPolicy, VerdictReceipt } from "@/lib/domain";
+import { formatConfidence } from "@/lib/verdict";
 import { StatusPill } from "./status-pill";
-
-function scoreLabel(score: number) {
-  return `${Math.round(score * 100)}% confidence`;
-}
 
 type CaseCardProps = {
   consentCase: ConsentCase;
@@ -74,7 +71,7 @@ export function CaseCard({ consentCase, policy, receipt }: CaseCardProps) {
             <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Score</span>
           </div>
-          <p className="mt-3 font-display text-3xl">{receipt ? scoreLabel(receipt.score) : "Queued"}</p>
+          <p className="mt-3 font-display text-3xl">{receipt ? formatConfidence(receipt.score) : "Queued"}</p>
           <p className="text-sm text-muted-foreground">
             {receipt ? receipt.recommendedAction : "Proceed to evidence review to continue the workflow."}
           </p>

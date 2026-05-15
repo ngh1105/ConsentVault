@@ -73,6 +73,16 @@ function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
   return items.map((entry) => (entry.id === item.id ? item : entry));
 }
 
+function upsertReceiptByCaseId(items: VerdictReceipt[], item: VerdictReceipt): VerdictReceipt[] {
+  const existingIndex = items.findIndex((entry) => entry.caseId === item.caseId);
+
+  if (existingIndex === -1) {
+    return [item, ...items];
+  }
+
+  return items.map((entry) => (entry.caseId === item.caseId ? item : entry));
+}
+
 export function createInitialConsentVaultState(): ConsentVaultState {
   return {
     policies: cloneState(samplePolicies),
@@ -138,7 +148,7 @@ export function consentVaultReducer(
     case "receipt/save": {
       return {
         ...state,
-        receipts: upsertById(state.receipts, action.payload),
+        receipts: upsertReceiptByCaseId(state.receipts, action.payload),
         cases: state.cases.map((item) =>
           item.id === action.payload.caseId
             ? {

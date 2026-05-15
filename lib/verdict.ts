@@ -52,12 +52,16 @@ export interface AggregateVerdictInput extends TrialInput {
   judgments: ValidatorJudgment[];
 }
 
+export function clampPercentageScore(score: number) {
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
 export function toPercentageScore(score: number) {
-  return score > 1 ? score : score * 100;
+  return clampPercentageScore(score);
 }
 
 export function formatConfidence(score: number) {
-  return `${Math.round(toPercentageScore(score))}% confidence`;
+  return `${toPercentageScore(score)}% confidence`;
 }
 
 export function collectCitedEvidenceIds(judgments: ValidatorJudgment[]) {
@@ -111,7 +115,7 @@ export function aggregateVerdict({ case: consentCase, policy, judgments }: Aggre
     id: `receipt-${consentCase.id}-trial`,
     caseId: consentCase.id,
     finalVerdict,
-    score: Math.round(averageConfidence * 100),
+    score: clampPercentageScore(averageConfidence * 100),
     summary: verdictCopy[finalVerdict].summary(
       policy.creatorName,
       supportingEvidenceCount,

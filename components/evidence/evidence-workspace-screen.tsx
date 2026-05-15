@@ -8,6 +8,7 @@ import { PolicyClauseList } from "@/components/evidence/policy-clause-list";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
 import { assessExternalUrl } from "@/lib/case-intake";
 import { matchPolicyClauses } from "@/lib/evidence";
+import { formatConfidence } from "@/lib/verdict";
 
 type EvidenceWorkspaceScreenProps = {
   caseId: string;
@@ -118,7 +119,7 @@ export function EvidenceWorkspaceScreen({ caseId }: EvidenceWorkspaceScreenProps
             </h2>
             <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
               {receipt
-                ? `${Math.round(receipt.score * 100)}% confidence. ${receipt.summary}`
+                ? `${formatConfidence(receipt.score)}. ${receipt.summary}`
                 : "No verdict receipt is attached yet, so the evidence file remains the primary review surface."}
             </p>
           </section>

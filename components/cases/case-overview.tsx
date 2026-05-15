@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight, FileSearch, Landmark, ScrollText } from "lucide-react";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
 import { StatusPill } from "@/components/dashboard/status-pill";
+import { formatConfidence } from "@/lib/verdict";
 
 type CaseOverviewProps = {
   caseId: string;
@@ -74,7 +75,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
               {receipt?.finalVerdict ?? "Pending receipt"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {receipt ? `${Math.round(receipt.score * 100)}% confidence` : "No verdict receipt generated yet."}
+              {receipt ? formatConfidence(receipt.score) : "No verdict receipt generated yet."}
             </p>
           </div>
         </div>

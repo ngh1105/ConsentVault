@@ -14,9 +14,27 @@ function missesAttribution(input: TrialInput) {
   );
 }
 
+function hasCommercializationSignal(input: TrialInput) {
+  const evidenceContent = input.case.evidenceItems
+    .map((item) => `${item.title} ${item.description} ${item.url}`)
+    .join(" ");
+  const content = `${input.case.notes} ${input.case.originalContent} ${input.case.aiOutput} ${evidenceContent}`.toLowerCase();
+
+  return /(subscriber-only|premium|sales deck|paid campaign|sponsored|revenue-generating|monetized|for sale|commercial deck|commercial adaptation|commercial distribution)/.test(
+    content,
+  );
+}
+
+function policyRequiresCommercialLicense(input: TrialInput) {
+  const policyConstraints = `${input.policy.licenseRules} ${input.policy.blockedUses.join(" ")}`.toLowerCase();
+
+  return /(commercial|revenue|paid|subscriber-only|premium|exclusive sublicensing)/.test(
+    policyConstraints,
+  );
+}
+
 function needsLicense(input: TrialInput) {
-  const content = `${input.case.notes} ${input.case.originalContent} ${input.case.aiOutput} ${input.policy.licenseRules}`.toLowerCase();
-  return /(commercial|paid|subscriber-only|premium|sales deck|license)/.test(content);
+  return hasCommercializationSignal(input) && policyRequiresCommercialLicense(input);
 }
 
 function hasHighSeverityBlockedUse(input: TrialInput) {

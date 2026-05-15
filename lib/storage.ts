@@ -45,6 +45,10 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+function isPercentageScore(value: unknown): value is number {
+  return isFiniteNumber(value) && value >= 0 && value <= 100;
+}
+
 function isConsentPolicy(value: unknown): value is ConsentPolicy {
   if (!isRecord(value)) {
     return false;
@@ -128,7 +132,7 @@ function isVerdictReceipt(value: unknown): value is VerdictReceipt {
     typeof value.caseId === "string" &&
     typeof value.finalVerdict === "string" &&
     VERDICT_CATEGORIES.has(value.finalVerdict as VerdictReceipt["finalVerdict"]) &&
-    isFiniteNumber(value.score) &&
+    isPercentageScore(value.score) &&
     typeof value.summary === "string" &&
     typeof value.recommendedAction === "string" &&
     Array.isArray(value.judgments) &&

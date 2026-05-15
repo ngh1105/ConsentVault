@@ -87,10 +87,40 @@ describe("consentVaultReducer", () => {
       },
     });
 
-    expect(next.receipts[0].id).toBe("receipt-updated");
+    expect(next.receipts.find((receipt) => receipt.caseId === state.cases[1].id)?.id).toBe(
+      "receipt-updated",
+    );
     expect(next.cases.find((item) => item.id === state.cases[1].id)?.status).toBe(
       "Verdict Ready",
     );
+  });
+
+  it("replaces the prior receipt for a case instead of appending a duplicate rerun", () => {
+    const state = createInitialConsentVaultState();
+    const priorReceipt = state.receipts.find((receipt) => receipt.caseId === sampleCases[0].id);
+
+    if (!priorReceipt) {
+      throw new Error("Expected seeded receipt for first sample case");
+    }
+
+    const rerunReceipt = {
+      ...priorReceipt,
+      id: "receipt-rerun-version",
+      score: 64,
+      summary: "Updated rerun summary",
+    };
+
+    const next = consentVaultReducer(state, {
+      type: "receipt/save",
+      payload: rerunReceipt,
+    });
+
+    expect(next.receipts.filter((receipt) => receipt.caseId === priorReceipt.caseId)).toHaveLength(1);
+    expect(next.receipts.find((receipt) => receipt.caseId === priorReceipt.caseId)).toMatchObject({
+      id: "receipt-rerun-version",
+      score: 64,
+      summary: "Updated rerun summary",
+    });
   });
 
   it("returns fresh seed copies for each initial state", () => {
