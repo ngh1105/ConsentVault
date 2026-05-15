@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test"
   },
