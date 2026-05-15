@@ -14,6 +14,7 @@ import type {
   ConsentCase,
   ConsentPolicy,
   ConsentVaultState,
+  EvidenceItem,
   VerdictReceipt,
 } from "@/lib/domain";
 import { sampleCases, samplePolicies, sampleReceipts } from "@/lib/sample-data";
@@ -26,12 +27,15 @@ import {
 } from "@/lib/storage";
 
 export interface CaseSubmission {
+  id?: string;
+  createdAt?: string;
   title: string;
   sourceUrl: string;
   aiOutputUrl: string;
   platformUrl: string;
   notes: string;
   policyId: string;
+  evidenceItems?: EvidenceItem[];
 }
 
 export type ConsentVaultAction =
@@ -103,19 +107,19 @@ export function consentVaultReducer(
       };
     }
     case "case/create": {
-      const timestamp = new Date().toISOString();
+      const timestamp = action.payload.createdAt ?? new Date().toISOString();
       const createdCase: ConsentCase = {
-        id: `case-${Date.now()}`,
-        title: action.payload.title,
+        id: action.payload.id ?? `case-${Date.now()}`,
+        title: action.payload.title.trim(),
         status: "Draft",
         policyId: action.payload.policyId,
-        sourceUrl: action.payload.sourceUrl,
-        aiOutputUrl: action.payload.aiOutputUrl,
-        platformUrl: action.payload.platformUrl,
-        notes: action.payload.notes,
+        sourceUrl: action.payload.sourceUrl.trim(),
+        aiOutputUrl: action.payload.aiOutputUrl.trim(),
+        platformUrl: action.payload.platformUrl.trim(),
+        notes: action.payload.notes.trim(),
         originalContent: "",
         aiOutput: "",
-        evidenceItems: [],
+        evidenceItems: action.payload.evidenceItems ?? [],
         createdAt: timestamp,
       };
 

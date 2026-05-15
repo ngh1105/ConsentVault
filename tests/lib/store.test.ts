@@ -37,6 +37,44 @@ describe("consentVaultReducer", () => {
     expect(next.activeCaseId).toBe(next.cases[0].id);
   });
 
+  it("keeps a provided case id, evidence bundle, and timestamp when creating a case", () => {
+    const state = createInitialConsentVaultState();
+    const next = consentVaultReducer(state, {
+      type: "case/create",
+      payload: {
+        id: "case-voice-clone-dispute",
+        createdAt: "2026-05-15T12:00:00.000Z",
+        title: "Voice clone dispute",
+        sourceUrl: "https://creator.example/source",
+        aiOutputUrl: "https://platform.example/output",
+        platformUrl: "https://platform.example/post",
+        notes: "Suspicious synthetic voice reuse",
+        policyId: sampleCases[0].policyId,
+        evidenceItems: [
+          {
+            id: "voice-clone-dispute-source",
+            type: "source",
+            title: "Voice clone dispute source record",
+            url: "https://creator.example/source",
+            description: "Original creator source gathered for Voice clone dispute. Suspicious synthetic voice reuse",
+            capturedAt: "voice-clone-dispute-source-captured",
+          },
+        ],
+      },
+    });
+
+    expect(next.cases[0]).toMatchObject({
+      id: "case-voice-clone-dispute",
+      createdAt: "2026-05-15T12:00:00.000Z",
+      evidenceItems: [
+        {
+          id: "voice-clone-dispute-source",
+          type: "source",
+        },
+      ],
+    });
+  });
+
   it("marks the matching case verdict ready when saving a receipt", () => {
     const state = createInitialConsentVaultState();
     const next = consentVaultReducer(state, {
