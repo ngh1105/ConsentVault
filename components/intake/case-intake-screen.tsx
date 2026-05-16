@@ -92,8 +92,8 @@ export function CaseIntakeScreen() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <article className="evidence-card p-6 sm:p-8">
+      <section className="archive-grid grid gap-6">
+        <article className="evidence-card min-w-0 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3">
             <span className="metadata-label">Dispute intake</span>
             <span className="rounded-full border border-ink/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
@@ -114,7 +114,7 @@ export function CaseIntakeScreen() {
                 <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Selected policy</span>
               </div>
               <p className="mt-3 font-display text-2xl">{selectedPolicy.creatorName}</p>
-              <p className="text-sm text-muted-foreground">{selectedPolicy.creatorHandle}</p>
+              <p className="archive-overflow-wrap text-sm text-muted-foreground">{selectedPolicy.creatorHandle}</p>
             </div>
             <div className="rounded-[1.4rem] border border-border/80 bg-background/70 p-5">
               <div className="flex items-center gap-2 text-accent">
@@ -135,12 +135,12 @@ export function CaseIntakeScreen() {
           </div>
         </article>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <section className="verdict-banner p-6 text-accent-foreground">
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.28em] text-accent-foreground/80">
               Policy citation
             </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold">{selectedPolicy.id}</h2>
+            <h2 className="mt-3 archive-overflow-wrap font-display text-3xl font-semibold">{selectedPolicy.id}</h2>
             <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
               Intake attaches this creator record so the case overview opens with the right consent context.
             </p>
@@ -159,8 +159,8 @@ export function CaseIntakeScreen() {
         </aside>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <article className="evidence-card p-6">
+      <section className="archive-grid grid gap-6">
+        <article className="evidence-card min-w-0 p-6">
           <p className="metadata-label">Submission form</p>
           <h2 className="mt-4 font-display text-3xl font-semibold">New dispute dossier</h2>
           <div className="mt-6">

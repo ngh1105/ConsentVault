@@ -25,7 +25,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground"
+          className="mt-6 inline-flex min-h-11 rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground"
         >
           Back to dashboard
         </Link>
@@ -40,7 +40,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
     <div className="space-y-6">
       <section className="evidence-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="metadata-label">Case overview</p>
             <h1 className="mt-4 font-display text-4xl font-semibold text-balance sm:text-5xl">
               {consentCase.title}
@@ -58,7 +58,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
               Creator policy
             </p>
             <p className="mt-3 font-display text-2xl">{policy?.creatorName ?? "Unknown creator"}</p>
-            <p className="text-sm text-muted-foreground">{policy?.creatorHandle ?? consentCase.policyId}</p>
+            <p className="archive-overflow-wrap text-sm text-muted-foreground">{policy?.creatorHandle ?? consentCase.policyId}</p>
           </div>
           <div className="rounded-[1.5rem] border border-border/80 bg-background/70 p-5">
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
@@ -81,8 +81,8 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <article className="evidence-card p-6">
+      <section className="archive-grid grid gap-6">
+        <article className="evidence-card min-w-0 p-6">
           <div className="flex items-center gap-3">
             <Landmark className="h-5 w-5 text-accent" aria-hidden="true" />
             <h2 className="font-display text-3xl font-semibold">Policy summary</h2>
@@ -135,7 +135,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
           )}
         </article>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <section className="evidence-card p-6">
             <div className="flex items-center gap-3">
               <ScrollText className="h-5 w-5 text-accent" aria-hidden="true" />
@@ -146,19 +146,19 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
                   Source URL
                 </dt>
-                <dd className="mt-1 break-all text-foreground">{consentCase.sourceUrl}</dd>
+                <dd className="archive-overflow-wrap mt-1 text-foreground">{consentCase.sourceUrl}</dd>
               </div>
               <div>
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
                   AI output URL
                 </dt>
-                <dd className="mt-1 break-all text-foreground">{consentCase.aiOutputUrl}</dd>
+                <dd className="archive-overflow-wrap mt-1 text-foreground">{consentCase.aiOutputUrl}</dd>
               </div>
               <div>
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
                   Platform URL
                 </dt>
-                <dd className="mt-1 break-all text-foreground">{consentCase.platformUrl}</dd>
+                <dd className="archive-overflow-wrap mt-1 text-foreground">{consentCase.platformUrl}</dd>
               </div>
             </dl>
           </section>
@@ -171,24 +171,24 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
             <div className="mt-5 space-y-3">
               <Link
                 href={`/cases/${consentCase.id}/evidence`}
-                className="flex items-center justify-between rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
               >
-                Evidence workspace
-                <ArrowUpRight className="h-4 w-4 text-accent" aria-hidden="true" />
+                <span>Evidence workspace</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
               </Link>
               <Link
                 href={`/cases/${consentCase.id}/trial`}
-                className="flex items-center justify-between rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
               >
-                Trial view
-                <ArrowUpRight className="h-4 w-4 text-accent" aria-hidden="true" />
+                <span>Trial view</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
               </Link>
               <Link
                 href={`/cases/${consentCase.id}/receipt`}
-                className="flex items-center justify-between rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-[1.2rem] border border-border/80 bg-background/65 px-4 py-3 text-sm text-foreground transition hover:border-accent/20 hover:bg-accent/6"
               >
-                Receipt view
-                <ArrowUpRight className="h-4 w-4 text-accent" aria-hidden="true" />
+                <span>Receipt view</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
               </Link>
             </div>
             {receipt ? (

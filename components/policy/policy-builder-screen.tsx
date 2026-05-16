@@ -51,8 +51,8 @@ export function PolicyBuilderScreen() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <article className="evidence-card p-6 sm:p-8">
+      <section className="archive-grid grid gap-6">
+        <article className="evidence-card min-w-0 p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-3">
             <span className="metadata-label">Policy builder</span>
             <span className="rounded-full border border-ink/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
@@ -73,7 +73,7 @@ export function PolicyBuilderScreen() {
                 <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Current policy</span>
               </div>
               <p className="mt-3 font-display text-2xl">{activePolicy.creatorName}</p>
-              <p className="text-sm text-muted-foreground">{activePolicy.creatorHandle}</p>
+              <p className="archive-overflow-wrap text-sm text-muted-foreground">{activePolicy.creatorHandle}</p>
             </div>
             <div className="rounded-[1.4rem] border border-border/80 bg-background/70 p-5">
               <div className="flex items-center gap-2 text-accent">
@@ -94,12 +94,12 @@ export function PolicyBuilderScreen() {
           </div>
         </article>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <section className="verdict-banner p-6 text-accent-foreground">
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.28em] text-accent-foreground/80">
               Active record target
             </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold">{activePolicy.id}</h2>
+            <h2 className="mt-3 archive-overflow-wrap font-display text-3xl font-semibold">{activePolicy.id}</h2>
             <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
               {activeCase
                 ? `This builder is editing the policy attached to ${activeCase.title}.`
@@ -128,8 +128,8 @@ export function PolicyBuilderScreen() {
         </aside>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <article className="evidence-card p-6">
+      <section className="archive-grid grid gap-6">
+        <article className="evidence-card min-w-0 p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="metadata-label">Editable policy</p>
@@ -152,7 +152,7 @@ export function PolicyBuilderScreen() {
           </div>
         </article>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <section className="evidence-card p-6">
             <p className="metadata-label">Preview</p>
             <h2 className="mt-4 font-display text-3xl font-semibold">Policy summary card</h2>
@@ -162,7 +162,9 @@ export function PolicyBuilderScreen() {
                   Creator
                 </p>
                 <p className="mt-2 font-display text-2xl">{preview.creatorName || "Unnamed creator"}</p>
-                <p className="text-sm text-muted-foreground">{preview.creatorHandle || "No handle supplied"}</p>
+                <p className="archive-overflow-wrap text-sm text-muted-foreground">
+                  {preview.creatorHandle || "No handle supplied"}
+                </p>
               </div>
               <div>
                 <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">

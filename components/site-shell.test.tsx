@@ -49,7 +49,7 @@ describe("dashboard shell and case overview", () => {
       </SiteShell>,
     );
 
-    expect(screen.getByRole("heading", { name: "ConsentVault" })).toBeVisible();
+    expect(screen.getByRole("link", { name: /ConsentVault/i })).toBeVisible();
     expect(screen.getByRole("link", { name: /New case intake/i })).toHaveAttribute(
       "href",
       "/cases/new",
@@ -116,16 +116,33 @@ describe("dashboard shell and case overview", () => {
     );
   });
 
-  it("reuses the Playwright host and port overrides across baseURL, command, and server URL", async () => {
+  it("uses a stable local Playwright port by default and only reuses servers when requested", async () => {
+    delete process.env.PLAYWRIGHT_PORT;
+    delete process.env.PLAYWRIGHT_REUSE_SERVER;
     process.env.PLAYWRIGHT_HOST = "127.0.0.1";
+
+    const defaultConfig = await loadPlaywrightConfig();
+    const defaultWebServer = Array.isArray(defaultConfig.webServer)
+      ? defaultConfig.webServer[0]
+      : defaultConfig.webServer;
+
+    expect(defaultConfig.use?.baseURL).toBe("http://127.0.0.1:3201");
+    expect(defaultWebServer?.url).toBe(defaultConfig.use?.baseURL);
+    expect(defaultWebServer?.command).toContain("--hostname 127.0.0.1 --port 3201");
+    expect(defaultWebServer?.reuseExistingServer).toBe(false);
+
     process.env.PLAYWRIGHT_PORT = "4100";
+    process.env.PLAYWRIGHT_REUSE_SERVER = "1";
 
-    const config = await loadPlaywrightConfig();
-    const webServer = Array.isArray(config.webServer) ? config.webServer[0] : config.webServer;
+    const overrideConfig = await loadPlaywrightConfig();
+    const overrideWebServer = Array.isArray(overrideConfig.webServer)
+      ? overrideConfig.webServer[0]
+      : overrideConfig.webServer;
 
-    expect(config.use?.baseURL).toBe("http://127.0.0.1:4100");
-    expect(webServer?.url).toBe("http://127.0.0.1:4100");
-    expect(webServer?.command).toContain("--hostname 127.0.0.1 --port 4100");
+    expect(overrideConfig.use?.baseURL).toBe("http://127.0.0.1:4100");
+    expect(overrideWebServer?.url).toBe("http://127.0.0.1:4100");
+    expect(overrideWebServer?.command).toContain("--hostname 127.0.0.1 --port 4100");
+    expect(overrideWebServer?.reuseExistingServer).toBe(true);
   });
 });
 

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { renderToString } from "react-dom/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { sampleCases, samplePolicies, sampleReceipts } from "@/lib/sample-data";
@@ -170,12 +171,37 @@ function ConsentVaultProbe() {
     React.createElement("div", { "data-testid": "case-count" }, String(state.cases.length)),
     React.createElement("div", { "data-testid": "receipt-count" }, String(state.receipts.length)),
     React.createElement("div", { "data-testid": "first-case-title" }, state.cases[0]?.title ?? ""),
+    React.createElement("div", { "data-testid": "first-receipt-score" }, String(state.receipts[0]?.score ?? "")),
   );
 }
 
 describe("ConsentVaultProvider persistence", () => {
   beforeEach(() => {
     window.localStorage.clear();
+  });
+
+  it("renders seed state on the first pass even when browser storage has a different receipt", () => {
+    const persisted = createInitialConsentVaultState();
+    persisted.receipts[0] = {
+      ...persisted.receipts[0],
+      score: 92,
+    };
+
+    window.localStorage.setItem(
+      CONSENT_VAULT_STORAGE_KEY,
+      serializeConsentVaultState(persisted),
+    );
+
+    const html = renderToString(
+      React.createElement(
+        ConsentVaultProvider,
+        null,
+        React.createElement(ConsentVaultProbe),
+      ),
+    );
+
+    expect(html).toContain(`data-testid="first-receipt-score">${sampleReceipts[0].score}`);
+    expect(html).not.toContain(`data-testid="first-receipt-score">92`);
   });
 
   it("falls back safely when localStorage contains an invalid payload", async () => {

@@ -9,6 +9,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from "react";
 import type {
   ConsentCase,
@@ -39,6 +40,7 @@ export interface CaseSubmission {
 }
 
 export type ConsentVaultAction =
+  | { type: "storage/hydrate"; payload: ConsentVaultState }
   | { type: "policy/save"; payload: ConsentPolicy }
   | { type: "case/create"; payload: CaseSubmission }
   | { type: "case/update"; payload: ConsentCase }
@@ -100,16 +102,14 @@ export function deserializeConsentVaultState(value: string): ConsentVaultState {
   return safeParseConsentVaultState(value) ?? createInitialConsentVaultState();
 }
 
-function createInitialStateFromStorage(): ConsentVaultState {
-  const stored = safeReadStorage(CONSENT_VAULT_STORAGE_KEY);
-  return stored ? deserializeConsentVaultState(stored) : createInitialConsentVaultState();
-}
-
 export function consentVaultReducer(
   state: ConsentVaultState,
   action: ConsentVaultAction,
 ): ConsentVaultState {
   switch (action.type) {
+    case "storage/hydrate": {
+      return action.payload;
+    }
     case "policy/save": {
       return {
         ...state,
@@ -175,12 +175,27 @@ export function ConsentVaultProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(
     consentVaultReducer,
     undefined,
-    createInitialStateFromStorage,
+    createInitialConsentVaultState,
   );
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    const stored = safeReadStorage(CONSENT_VAULT_STORAGE_KEY);
+
+    if (stored) {
+      dispatch({ type: "storage/hydrate", payload: deserializeConsentVaultState(stored) });
+    }
+
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
     safeWriteStorage(CONSENT_VAULT_STORAGE_KEY, serializeConsentVaultState(state));
-  }, [state]);
+  }, [isHydrated, state]);
 
   const value = useMemo<ConsentVaultContextValue>(() => {
     const getCaseById = (caseId: string) => state.cases.find((item) => item.id === caseId);

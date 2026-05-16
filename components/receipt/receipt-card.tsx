@@ -16,9 +16,9 @@ export function ReceiptCard({ consentCase, policy, receipt }: ReceiptCardProps) 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="metadata-label">Verdict receipt</p>
-          <h2 id="receipt-card-title" className="mt-4 font-display text-4xl font-semibold text-balance sm:text-5xl">
+          <h1 id="receipt-card-title" className="mt-4 font-display text-4xl font-semibold text-balance sm:text-5xl">
             {consentCase.title}
-          </h2>
+          </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
             Final archived ruling for {policy.creatorName}, prepared for moderation handoff, creator follow-up,
             and future policy review.

@@ -32,10 +32,31 @@ function isDownloadAvailable() {
   );
 }
 
+type BrowserCapabilities = {
+  clipboard: boolean;
+  download: boolean;
+};
+
+const unavailableCapabilities: BrowserCapabilities = {
+  clipboard: false,
+  download: false,
+};
+
+function getBrowserCapabilities(): BrowserCapabilities {
+  return {
+    clipboard: isClipboardAvailable(),
+    download: isDownloadAvailable(),
+  };
+}
+
 export function ShareActions({ receipt }: ShareActionsProps) {
   const [actionState, setActionState] = React.useState<ActionState>(defaultState);
   const [isCopying, setIsCopying] = React.useState(false);
+  const [capabilities, setCapabilities] = React.useState<BrowserCapabilities>(unavailableCapabilities);
 
+  React.useEffect(() => {
+    setCapabilities(getBrowserCapabilities());
+  }, []);
   async function handleCopy() {
     setIsCopying(true);
 
@@ -82,7 +103,7 @@ export function ShareActions({ receipt }: ShareActionsProps) {
         <button
           type="button"
           onClick={handleDownload}
-          disabled={!isDownloadAvailable()}
+          disabled={!capabilities.download}
           aria-label="Download receipt JSON"
           className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-border/80 bg-background/70 px-5 py-4 text-left transition hover:border-accent/20 hover:bg-accent/6 disabled:cursor-not-allowed disabled:opacity-55"
         >
@@ -103,7 +124,7 @@ export function ShareActions({ receipt }: ShareActionsProps) {
           onClick={() => {
             void handleCopy();
           }}
-          disabled={!isClipboardAvailable() || isCopying}
+          disabled={!capabilities.clipboard || isCopying}
           aria-label="Copy receipt JSON to clipboard"
           className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-border/80 bg-background/70 px-5 py-4 text-left transition hover:border-accent/20 hover:bg-accent/6 disabled:cursor-not-allowed disabled:opacity-55"
         >
@@ -141,7 +162,7 @@ export function ShareActions({ receipt }: ShareActionsProps) {
           )}
           <p className="text-sm leading-6 text-foreground">{actionState.message}</p>
         </div>
-        {!isDownloadAvailable() || !isClipboardAvailable() ? (
+        {!capabilities.download || !capabilities.clipboard ? (
           <p className="mt-3 text-xs leading-5 text-muted-foreground">
             Some browser APIs are unavailable here, so one or more share actions are disabled.
           </p>

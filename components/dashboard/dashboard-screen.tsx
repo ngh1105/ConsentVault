@@ -21,9 +21,9 @@ export function DashboardScreen() {
               case workflow
             </span>
           </div>
-          <h2 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-tight text-balance sm:text-5xl">
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-tight text-balance sm:text-5xl">
             Review creator policies, inspect disputes, and move the docket toward a receipt.
-          </h2>
+          </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
             ConsentVault keeps the active archive in one place: every case links back to the creator policy, evidence count, and the latest tribunal signal.
           </p>
