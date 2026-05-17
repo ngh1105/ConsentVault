@@ -21,7 +21,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
         <p className="metadata-label">Case not found</p>
         <h1 className="mt-5 font-display text-4xl font-semibold">No archive record matches this case.</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-          Return to the dashboard to open one of the seeded disputes or create a new case in a later task.
+          Return to the dashboard to open one of the seeded disputes or create a fresh case from the intake desk.
         </p>
         <Link
           href="/"

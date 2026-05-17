@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CaseIntakeScreen } from "@/components/intake/case-intake-screen";
@@ -52,11 +52,21 @@ describe("CaseIntakeScreen", () => {
 
     render(<CaseIntakeScreen />);
 
-    await user.type(screen.getByLabelText(/Suspicious content title/i), "Voice clone dispute");
-    await user.type(screen.getByLabelText(/Original source URL/i), "https://creator.example/source");
-    await user.type(screen.getByLabelText(/AI output URL/i), "https://platform.example/output");
-    await user.type(screen.getByLabelText(/^Platform URL$/i), "https://platform.example/post");
-    await user.type(screen.getByLabelText(/Intake notes/i), "Suspicious synthetic voice reuse");
+    fireEvent.change(screen.getByLabelText(/Suspicious content title/i), {
+      target: { value: "Voice clone dispute" },
+    });
+    fireEvent.change(screen.getByLabelText(/Original source URL/i), {
+      target: { value: "https://creator.example/source" },
+    });
+    fireEvent.change(screen.getByLabelText(/AI output URL/i), {
+      target: { value: "https://platform.example/output" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Platform URL$/i), {
+      target: { value: "https://platform.example/post" },
+    });
+    fireEvent.change(screen.getByLabelText(/Intake notes/i), {
+      target: { value: "Suspicious synthetic voice reuse" },
+    });
     await user.click(screen.getByRole("button", { name: /Open draft case/i }));
 
     expect(mockedBuildPreparedIntakeCaseSubmission).toHaveBeenCalledTimes(1);
@@ -133,10 +143,18 @@ describe("CaseIntakeScreen", () => {
 
     render(<CaseIntakeScreen />);
 
-    await user.type(screen.getByLabelText(/Suspicious content title/i), "Voice clone dispute");
-    await user.type(screen.getByLabelText(/Original source URL/i), "https://creator.example/source");
-    await user.type(screen.getByLabelText(/AI output URL/i), "https://platform.example/output");
-    await user.type(screen.getByLabelText(/^Platform URL$/i), "https://platform.example/post");
+    fireEvent.change(screen.getByLabelText(/Suspicious content title/i), {
+      target: { value: "Voice clone dispute" },
+    });
+    fireEvent.change(screen.getByLabelText(/Original source URL/i), {
+      target: { value: "https://creator.example/source" },
+    });
+    fireEvent.change(screen.getByLabelText(/AI output URL/i), {
+      target: { value: "https://platform.example/output" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Platform URL$/i), {
+      target: { value: "https://platform.example/post" },
+    });
 
     const submitButton = screen.getByRole("button", { name: /Open draft case/i });
     await user.dblClick(submitButton);

@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import type {
+  CaseStatus,
   ConsentCase,
   ConsentPolicy,
   ConsentVaultState,
@@ -85,6 +86,37 @@ function upsertReceiptByCaseId(items: VerdictReceipt[], item: VerdictReceipt): V
   return items.map((entry) => (entry.caseId === item.caseId ? item : entry));
 }
 
+function summarizeEvidenceItems(evidenceItems: EvidenceItem[]): {
+  originalContent: string;
+  aiOutput: string;
+} {
+  const sourceItem = evidenceItems.find((item) => item.type === "source");
+  const outputItem = evidenceItems.find((item) => item.type === "output");
+
+  return {
+    originalContent: sourceItem?.description ?? sourceItem?.title ?? "",
+    aiOutput: outputItem?.description ?? outputItem?.title ?? "",
+  };
+}
+
+export function getEffectiveCaseStatus(
+  consentCase: ConsentCase,
+  receipts: VerdictReceipt[],
+): CaseStatus {
+  return receipts.some((receipt) => receipt.caseId === consentCase.id)
+    ? "Verdict Ready"
+    : consentCase.status;
+}
+
+export function withEffectiveCaseStatus(
+  consentCase: ConsentCase,
+  receipts: VerdictReceipt[],
+): ConsentCase {
+  const status = getEffectiveCaseStatus(consentCase, receipts);
+
+  return status === consentCase.status ? consentCase : { ...consentCase, status };
+}
+
 export function createInitialConsentVaultState(): ConsentVaultState {
   return {
     policies: cloneState(samplePolicies),
@@ -118,6 +150,8 @@ export function consentVaultReducer(
     }
     case "case/create": {
       const timestamp = action.payload.createdAt ?? new Date().toISOString();
+      const evidenceItems = action.payload.evidenceItems ?? [];
+      const { originalContent, aiOutput } = summarizeEvidenceItems(evidenceItems);
       const createdCase: ConsentCase = {
         id: action.payload.id ?? `case-${Date.now()}`,
         title: action.payload.title.trim(),
@@ -127,9 +161,9 @@ export function consentVaultReducer(
         aiOutputUrl: action.payload.aiOutputUrl.trim(),
         platformUrl: action.payload.platformUrl.trim(),
         notes: action.payload.notes.trim(),
-        originalContent: "",
-        aiOutput: "",
-        evidenceItems: action.payload.evidenceItems ?? [],
+        originalContent,
+        aiOutput,
+        evidenceItems,
         createdAt: timestamp,
       };
 
@@ -198,7 +232,8 @@ export function ConsentVaultProvider({ children }: PropsWithChildren) {
   }, [isHydrated, state]);
 
   const value = useMemo<ConsentVaultContextValue>(() => {
-    const getCaseById = (caseId: string) => state.cases.find((item) => item.id === caseId);
+    const cases = state.cases.map((item) => withEffectiveCaseStatus(item, state.receipts));
+    const getCaseById = (caseId: string) => cases.find((item) => item.id === caseId);
     const getPolicyById = (policyId: string) =>
       state.policies.find((item) => item.id === policyId);
     const getReceiptByCaseId = (caseId: string) =>
@@ -208,7 +243,7 @@ export function ConsentVaultProvider({ children }: PropsWithChildren) {
       state,
       dispatch,
       policies: state.policies,
-      cases: state.cases,
+      cases,
       receipts: state.receipts,
       activeCase: getCaseById(state.activeCaseId),
       getCaseById,

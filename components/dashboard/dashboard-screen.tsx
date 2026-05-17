@@ -52,7 +52,7 @@ export function DashboardScreen() {
             </p>
             <h3 className="mt-3 font-display text-3xl font-semibold">{verdictReadyCount} cases verdict-ready</h3>
             <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
-              Cases with generated receipts can move directly into evidence review, trial replay, or export in later tasks.
+              Cases with generated receipts can move directly into evidence review, trial replay, or export from the active receipt surface.
             </p>
           </section>
 

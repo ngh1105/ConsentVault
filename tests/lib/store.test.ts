@@ -9,8 +9,10 @@ import {
   consentVaultReducer,
   createInitialConsentVaultState,
   deserializeConsentVaultState,
+  getEffectiveCaseStatus,
   serializeConsentVaultState,
   useConsentVault,
+  withEffectiveCaseStatus,
 } from "@/lib/store";
 
 afterEach(() => {
@@ -67,6 +69,9 @@ describe("consentVaultReducer", () => {
     expect(next.cases[0]).toMatchObject({
       id: "case-voice-clone-dispute",
       createdAt: "2026-05-15T12:00:00.000Z",
+      originalContent:
+        "Original creator source gathered for Voice clone dispute. Suspicious synthetic voice reuse",
+      aiOutput: "",
       evidenceItems: [
         {
           id: "voice-clone-dispute-source",
@@ -75,6 +80,45 @@ describe("consentVaultReducer", () => {
       ],
     });
     expect(next.activeCaseId).toBe("case-voice-clone-dispute");
+  });
+
+  it("hydrates new intake cases with comparison text from source and output evidence", () => {
+    const state = createInitialConsentVaultState();
+    const next = consentVaultReducer(state, {
+      type: "case/create",
+      payload: {
+        id: "case-comparison-ready",
+        title: "Comparison ready dispute",
+        sourceUrl: "https://creator.example/source",
+        aiOutputUrl: "https://platform.example/output",
+        platformUrl: "https://platform.example/post",
+        notes: "Synthetic reuse appears close to the original",
+        policyId: sampleCases[0].policyId,
+        evidenceItems: [
+          {
+            id: "comparison-source",
+            type: "source",
+            title: "Comparison source",
+            url: "https://creator.example/source",
+            description: "Original creator source gathered for comparison.",
+            capturedAt: "2026-05-15T12:00:00.000Z",
+          },
+          {
+            id: "comparison-output",
+            type: "output",
+            title: "Comparison output",
+            url: "https://platform.example/output",
+            description: "AI-generated output gathered for comparison.",
+            capturedAt: "2026-05-15T12:01:00.000Z",
+          },
+        ],
+      },
+    });
+
+    expect(next.cases[0]).toMatchObject({
+      originalContent: "Original creator source gathered for comparison.",
+      aiOutput: "AI-generated output gathered for comparison.",
+    });
   });
 
   it("marks the matching case verdict ready when saving a receipt", () => {
@@ -94,6 +138,24 @@ describe("consentVaultReducer", () => {
     expect(next.cases.find((item) => item.id === state.cases[1].id)?.status).toBe(
       "Verdict Ready",
     );
+  });
+
+  it("derives verdict-ready status for cases that already have a receipt", () => {
+    const state = createInitialConsentVaultState();
+    const receiptBackedCase = {
+      ...state.cases[1],
+      status: "Draft" as const,
+    };
+    const receipt = {
+      ...sampleReceipts[0],
+      caseId: receiptBackedCase.id,
+    };
+
+    expect(getEffectiveCaseStatus(receiptBackedCase, [receipt])).toBe("Verdict Ready");
+    expect(withEffectiveCaseStatus(receiptBackedCase, [receipt])).toMatchObject({
+      id: receiptBackedCase.id,
+      status: "Verdict Ready",
+    });
   });
 
   it("replaces the prior receipt for a case instead of appending a duplicate rerun", () => {
