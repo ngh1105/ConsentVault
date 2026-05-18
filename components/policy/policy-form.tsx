@@ -193,7 +193,7 @@ export function PolicyForm({
           <button
             type="submit"
             disabled={isSaving}
-            className="inline-flex items-center justify-center rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground shadow-sm transition hover:translate-y-[-1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center justify-center rounded-full bg-[hsl(350_80%_44%)] px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-white shadow-sm transition hover:translate-y-[-1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSaving ? "Saving policy" : "Save policy"}
           </button>

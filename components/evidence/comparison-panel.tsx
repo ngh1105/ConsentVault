@@ -89,11 +89,11 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
               role="tabpanel"
               aria-labelledby={tabId}
               hidden={!isActive}
-              className="rounded-[1.7rem] border border-border/80 bg-background/70 p-5"
+              className="rounded-[1.7rem] border border-border/80 bg-background p-5"
             >
-              <div className="flex items-center gap-2 text-accent">
-                <ScrollText className="h-4 w-4" aria-hidden="true" />
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">{pane.label}</p>
+              <div className="flex items-center gap-2">
+                <ScrollText className="h-4 w-4 text-accent" aria-hidden="true" />
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-foreground">{pane.label}</p>
               </div>
               <h3 className="mt-3 text-2xl font-semibold">{pane.heading}</h3>
               <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-foreground">{pane.body(consentCase)}</p>
@@ -104,7 +104,7 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
 
       <div className="mt-6 hidden gap-4 lg:grid lg:grid-cols-2">
         {panes.map((pane) => (
-          <article key={pane.key} className="rounded-[1.8rem] border border-border/80 bg-background/70 p-5 xl:p-6">
+          <article key={pane.key} className="rounded-[1.8rem] border border-border/80 bg-background p-5 xl:p-6">
             <div className="flex items-center gap-2 text-accent">
               <ScrollText className="h-4 w-4" aria-hidden="true" />
               <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">{pane.label}</p>

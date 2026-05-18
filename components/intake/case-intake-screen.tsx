@@ -214,7 +214,7 @@ export function CaseIntakeScreen() {
             type="button"
             onClick={() => { void handleSubmit(); }}
             disabled={isSubmitting}
-            className="inline-flex h-10 items-center rounded-full bg-accent px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-10 items-center rounded-full bg-[hsl(350_80%_44%)] px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Opening case" : "Open draft case"}
           </button>

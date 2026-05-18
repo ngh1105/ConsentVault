@@ -35,11 +35,11 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
           return (
             <article
               key={item.id}
-              className="rounded-[1.45rem] border border-border/80 bg-background/70 p-5"
+              className="rounded-[1.45rem] border border-border/80 bg-background p-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-accent">
+                  <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-foreground">
                     {item.type}
                   </p>
                   <h3 className="mt-3 font-display text-2xl font-semibold">{item.title}</h3>
