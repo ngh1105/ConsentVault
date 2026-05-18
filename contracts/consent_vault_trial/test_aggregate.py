@@ -8,6 +8,9 @@ must move together.
 
 from __future__ import annotations
 
+import ast
+from pathlib import Path
+
 import pytest
 
 from aggregate import (
@@ -146,3 +149,64 @@ class TestVerdictCopy:
         summary, action = verdict_copy(verdict, "Mara", 3, 2)
         assert isinstance(summary, str) and summary
         assert isinstance(action, str) and action
+
+
+GOLDEN_VERDICT_COPY = {
+    ("Allowed", "Acme", 0, 1): (
+        "1 validators found the use compatible with Acme's policy after reviewing 0 linked evidence references.",
+        "Archive the receipt, preserve the evidence trail, and monitor for future policy drift.",
+    ),
+    ("Needs Attribution", "Acme", 5, 2): (
+        "2 validators agreed the reuse is likely permissible, but Acme's attribution requirements were not carried through the 5 cited records.",
+        "Request corrected crediting and synthetic labeling before escalating beyond Acme's policy workflow.",
+    ),
+    ("Needs License", "Acme", 5, 3): (
+        "3 validators found that the reuse exceeds Acme's standing permissions and points to a licensing gap across 5 cited records.",
+        "Pause further distribution and obtain a documented license or remove the reused material.",
+    ),
+    ("Impersonation Risk", "Acme", 5, 1): (
+        "1 validators detected likely identity imitation tied to Acme's protected persona, supported by 5 cited evidence references.",
+        "Escalate to trust and safety with the evidence bundle and request urgent review for deceptive synthetic media.",
+    ),
+    ("Violation", "Acme", 5, 2): (
+        "2 validators concluded the reuse conflicts directly with Acme's policy and the 5 cited records support enforcement-ready escalation.",
+        "Preserve the receipt, notify the platform, and prepare a formal enforcement or takedown request.",
+    ),
+}
+
+
+@pytest.mark.parametrize("args,expected", list(GOLDEN_VERDICT_COPY.items()))
+def test_aggregate_verdict_copy_matches_golden(args, expected):
+    verdict, creator, evidence, support = args
+    assert verdict_copy(verdict, creator, evidence, support) == expected
+
+
+def _extract_verdict_copy_from_main():
+    main_src = Path(__file__).parent / "main.py"
+    tree = ast.parse(main_src.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name == "_verdict_copy":
+            module = ast.Module(body=[node], type_ignores=[])
+            namespace: dict = {}
+            exec(compile(module, str(main_src), "exec"), namespace)
+            return namespace["_verdict_copy"]
+    raise RuntimeError("_verdict_copy not found in main.py")
+
+
+@pytest.mark.parametrize("args,expected", list(GOLDEN_VERDICT_COPY.items()))
+def test_main_py_verdict_copy_matches_golden(args, expected):
+    main_verdict_copy = _extract_verdict_copy_from_main()
+    assert main_verdict_copy(*args) == expected
+
+
+def test_aggregate_caller_preserves_case_id():
+    judgments = normalize_judgments([
+        {"id": "v1", "verdict": "Allowed", "confidence": 0.9, "validatorName": "A"},
+        {"id": "v2", "verdict": "Allowed", "confidence": 0.8, "validatorName": "B"},
+        {"id": "v3", "verdict": "Allowed", "confidence": 0.7, "validatorName": "C"},
+    ])
+    result_with_id = aggregate(judgments, {"id": "case-123"}, {"creatorName": "Acme"})
+    assert result_with_id["caseId"] == "case-123"
+
+    result_without_id = aggregate(judgments, {"id": ""}, {"creatorName": "Acme"})
+    assert result_without_id["caseId"] == ""

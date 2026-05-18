@@ -234,6 +234,8 @@ class ConsentVaultTrial(gl.Contract):
         """Run the three-validator trial and persist the JSON-encoded result."""
         case = json.loads(case_json)
         policy = json.loads(policy_json)
+        case_id = case.get("id", "")
+        assert case_id, "case_id must be non-empty"
         prompt = _build_prompt(case, policy)
 
         def evaluate():
@@ -255,9 +257,7 @@ class ConsentVaultTrial(gl.Contract):
         )
 
         assert isinstance(result, str)
-        case_id = case.get("id", "")
-        if case_id:
-            self.last_result_by_case[case_id] = result
+        self.last_result_by_case[case_id] = result
         return result
 
     @gl.public.view
