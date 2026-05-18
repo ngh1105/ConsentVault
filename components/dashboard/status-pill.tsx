@@ -9,7 +9,7 @@ const statusPillVariants = cva(
       status: {
         Draft: "border-border bg-muted/70 text-muted-foreground",
         "In Review": "border-amber-700/15 bg-amber-600/10 text-amber-900",
-        "Verdict Ready": "border-accent/20 bg-accent/10 text-accent",
+        "Verdict Ready": "border-accent/30 bg-accent/5 text-foreground",
       },
     },
     defaultVariants: {

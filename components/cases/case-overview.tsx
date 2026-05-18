@@ -24,7 +24,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex h-11 items-center rounded-full bg-accent px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground"
+          className="mt-6 inline-flex h-11 items-center rounded-full bg-[hsl(350_80%_44%)] px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white"
         >
           Back to dashboard
         </Link>
@@ -49,7 +49,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
       cta: (
         <Link
           href={`/cases/${consentCase.id}/evidence`}
-          className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
+          className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
         >
           Open evidence workspace
           <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -71,7 +71,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
             cta: (
               <Link
                 href={`/cases/${consentCase.id}/receipt`}
-                className="inline-flex items-center gap-2 text-sm text-accent hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
               >
                 View receipt
                 <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -114,7 +114,7 @@ export function CaseOverview({ caseId }: CaseOverviewProps) {
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
           href={`/cases/${consentCase.id}/evidence`}
-          className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-colors hover:opacity-90"
+          className="inline-flex h-11 items-center rounded-full bg-[hsl(350_80%_44%)] px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90"
         >
           Evidence workspace
         </Link>

@@ -27,7 +27,7 @@ export function StatePanel({
       <div className="flex flex-wrap items-center gap-3">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
         {loading ? (
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent/15 bg-accent/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
             <LoaderCircle className="h-3.5 w-3.5 animate-spin text-accent" aria-hidden="true" />
             Loading archive
           </span>

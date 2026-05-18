@@ -27,7 +27,7 @@ export function EvidenceWorkspaceScreen({ caseId }: EvidenceWorkspaceScreenProps
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex h-11 items-center rounded-full bg-accent px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground"
+          className="mt-6 inline-flex h-11 items-center rounded-full bg-[hsl(350_80%_44%)] px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white"
         >
           Back to dashboard
         </Link>
@@ -99,7 +99,7 @@ export function EvidenceWorkspaceScreen({ caseId }: EvidenceWorkspaceScreenProps
                           href={assessment.href}
                           target="_blank"
                           rel="noreferrer"
-                          className="break-all text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent"
+                          className="break-all text-foreground underline decoration-accent underline-offset-4 hover:decoration-accent"
                         >
                           {assessment.normalized}
                         </a>

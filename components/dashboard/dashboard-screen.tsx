@@ -53,7 +53,7 @@ export function DashboardScreen() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/cases/new"
-              className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground transition-colors hover:opacity-90"
+              className="inline-flex h-11 items-center rounded-full bg-[hsl(350_80%_44%)] px-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90"
             >
               Create case
             </Link>
@@ -111,7 +111,7 @@ export function DashboardScreen() {
                 cta={
                   <Link
                     href="/cases/new"
-                    className="inline-flex h-10 items-center rounded-full bg-accent px-5 font-mono text-xs uppercase tracking-[0.18em] text-accent-foreground"
+                    className="inline-flex h-10 items-center rounded-full bg-[hsl(350_80%_44%)] px-5 font-mono text-xs uppercase tracking-[0.18em] text-white"
                   >
                     Open new case
                   </Link>
