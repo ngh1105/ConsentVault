@@ -68,10 +68,14 @@ export function buildReceiptWalletMetadata(
   };
 }
 
-export function createGenLayerWalletClient(provider: EthereumProvider) {
+export function createGenLayerWalletClient(
+  provider: EthereumProvider,
+  account?: `0x${string}`,
+) {
   return createClient({
     chain: GENLAYER_WALLET_NETWORK,
     provider,
+    account,
   });
 }
 

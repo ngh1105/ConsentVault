@@ -88,7 +88,8 @@ export function GenLayerWalletProvider({ children }: React.PropsWithChildren) {
         throw new Error("Wallet did not return an account.");
       }
 
-      const nextClient = createGenLayerWalletClient(provider);
+      const accountAddress = nextAddress as `0x${string}`;
+      const nextClient = createGenLayerWalletClient(provider, accountAddress);
       await connectClientToStudionet(nextClient);
 
       const connectedChainId =
