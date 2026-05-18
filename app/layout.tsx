@@ -18,9 +18,41 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ConsentVault",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://consentvault.local",
+  ),
+  title: {
+    default: "ConsentVault — AI consent verdict archive",
+    template: "%s · ConsentVault",
+  },
   description:
-    "ConsentVault is a polished archive-style demo for reviewing AI content consent disputes and simulated verdict receipts.",
+    "ConsentVault is a polished archive-style demo for reviewing AI content consent disputes and GenLayer-backed verdict receipts.",
+  keywords: [
+    "GenLayer",
+    "AI consent",
+    "content moderation",
+    "creator policy",
+    "verdict receipt",
+    "trial",
+  ],
+  applicationName: "ConsentVault",
+  openGraph: {
+    type: "website",
+    title: "ConsentVault — AI consent verdict archive",
+    description:
+      "Capture creator consent policies, bundle dispute evidence, and run a GenLayer-backed trial that produces a shareable verdict receipt.",
+    siteName: "ConsentVault",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ConsentVault — AI consent verdict archive",
+    description:
+      "GenLayer-backed verdict receipts for AI content consent disputes.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
