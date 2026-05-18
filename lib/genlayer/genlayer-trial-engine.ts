@@ -79,9 +79,11 @@ function ensureStringArray(value: unknown): string[] {
 }
 
 function normalizeJudgment(raw: RawJudgment, index: number): ValidatorJudgment {
+  const validatorName = ensureString(raw.validatorName, `Validator ${index + 1}`);
+  const fallbackSlug = (validatorName || "unknown").toLowerCase().replace(/\s+/g, "-");
   return {
-    id: ensureString(raw.id, `validator-${index}`),
-    validatorName: ensureString(raw.validatorName, `Validator ${index + 1}`),
+    id: ensureString(raw.id, `validator-${fallbackSlug}-${index}`),
+    validatorName,
     verdict: ensureVerdict(raw.verdict),
     confidence: ensureNumber(raw.confidence),
     reasoning: ensureString(raw.reasoning),
@@ -186,25 +188,35 @@ export class GenLayerTrialEngine implements TrialEngine {
         address: contractAddress,
         functionName: "run_trial",
         args: [caseJson, policyJson],
-        value: BigInt(0),
       })) as unknown;
-      txHash = typeof rawHash === "string" ? rawHash : String(rawHash);
+
+      if (typeof rawHash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(rawHash)) {
+        throw new GenLayerTrialEngineExecutionError(
+          `writeContract returned an invalid transaction hash: ${String(rawHash)}`,
+        );
+      }
+      txHash = rawHash;
     } catch (error) {
+      if (error instanceof GenLayerTrialEngineExecutionError) {
+        throw error;
+      }
       throw new GenLayerTrialEngineExecutionError(
         "writeContract for run_trial failed; user may have rejected the transaction or the network is unreachable.",
         error,
       );
     }
 
+    interface WaitForReceiptArgs {
+      hash: string;
+      status: "FINALIZED";
+    }
+
     let receiptStatus: { txExecutionResultName?: string } | null = null;
     try {
-      const waitArgs = {
-        hash: txHash,
-        status: "FINALIZED",
-      } as unknown as Parameters<typeof readClient.waitForTransactionReceipt>[0];
-      receiptStatus = (await readClient.waitForTransactionReceipt(waitArgs)) as {
-        txExecutionResultName?: string;
-      };
+      const waitArgs: WaitForReceiptArgs = { hash: txHash, status: "FINALIZED" };
+      receiptStatus = (await readClient.waitForTransactionReceipt(
+        waitArgs as Parameters<typeof readClient.waitForTransactionReceipt>[0],
+      )) as { txExecutionResultName?: string };
     } catch (error) {
       throw new GenLayerTrialEngineExecutionError(
         "Timed out waiting for the run_trial transaction to finalize.",

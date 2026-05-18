@@ -8,6 +8,8 @@ import type { TrialInput } from "@/lib/trial-engine";
 import { impersonationCase, restrictivePolicy } from "@/lib/sample-data";
 
 const TEST_ADDRESS = "0xabcdef0123456789abcdef0123456789abcdef01" as const;
+const TEST_TX_HASH =
+  "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd" as const;
 
 function buildInput(overrides: Partial<TrialInput> = {}): TrialInput {
   return {
@@ -55,7 +57,7 @@ function buildContractPayload(overrides: Record<string, unknown> = {}) {
 }
 
 function makeMockClients(payload: string = buildContractPayload()) {
-  const writeContract = vi.fn().mockResolvedValue("0xdeadbeef");
+  const writeContract = vi.fn().mockResolvedValue(TEST_TX_HASH);
   const waitForTransactionReceipt = vi
     .fn()
     .mockResolvedValue({ txExecutionResultName: "FINISHED_WITH_RETURN" });
@@ -102,10 +104,9 @@ describe("GenLayerTrialEngine.runTrial happy path", () => {
       address: TEST_ADDRESS,
       functionName: "run_trial",
       args: [JSON.stringify(impersonationCase), JSON.stringify(restrictivePolicy)],
-      value: BigInt(0),
     });
     expect(waitForTransactionReceipt).toHaveBeenCalledWith({
-      hash: "0xdeadbeef",
+      hash: TEST_TX_HASH,
       status: "FINALIZED",
     });
     expect(readContract).toHaveBeenCalledWith({
@@ -191,5 +192,46 @@ describe("GenLayerTrialEngine.runTrial error paths", () => {
     await expect(engine.runTrial(buildInput())).rejects.toBeInstanceOf(
       GenLayerTrialEngineExecutionError,
     );
+  });
+
+  it("throws when writeContract returns undefined", async () => {
+    const walletClient = {
+      writeContract: vi.fn().mockResolvedValue(undefined),
+    } as never;
+    const readClient = {
+      waitForTransactionReceipt: vi.fn(),
+      readContract: vi.fn(),
+    } as never;
+
+    const engine = new GenLayerTrialEngine({
+      contractAddress: TEST_ADDRESS,
+      walletClient,
+      readClient,
+    });
+
+    await expect(
+      engine.runTrial(buildInput({ wallet: undefined })),
+    ).rejects.toThrow(/invalid transaction hash/i);
+    expect(readClient.waitForTransactionReceipt).not.toHaveBeenCalled();
+  });
+
+  it("throws when writeContract returns a non-hex string", async () => {
+    const walletClient = {
+      writeContract: vi.fn().mockResolvedValue("not-a-hash"),
+    } as never;
+    const readClient = {
+      waitForTransactionReceipt: vi.fn(),
+      readContract: vi.fn(),
+    } as never;
+
+    const engine = new GenLayerTrialEngine({
+      contractAddress: TEST_ADDRESS,
+      walletClient,
+      readClient,
+    });
+
+    await expect(
+      engine.runTrial(buildInput({ wallet: undefined })),
+    ).rejects.toThrow(/invalid transaction hash/i);
   });
 });
