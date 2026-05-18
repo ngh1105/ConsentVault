@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { GenLayerWalletProvider } from "@/components/providers/genlayer-wallet-provider";
 import { ConsentVaultProvider } from "@/components/providers/consent-vault-provider";
 import { SiteShell } from "@/components/site-shell";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
       <body>
         <ConsentVaultProvider>
-          <SiteShell>{children}</SiteShell>
+          <GenLayerWalletProvider>
+            <SiteShell>{children}</SiteShell>
+          </GenLayerWalletProvider>
         </ConsentVaultProvider>
       </body>
     </html>

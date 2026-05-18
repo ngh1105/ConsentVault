@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 import { ArrowUpRight, ScrollText } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { Navigation } from "@/components/navigation";
+import { WalletConnectButton } from "@/components/wallet/wallet-connect-button";
 
 export function SiteShell({ children }: PropsWithChildren) {
   return (
@@ -16,6 +17,7 @@ export function SiteShell({ children }: PropsWithChildren) {
             <BrandMark titleAs="div" className="max-w-3xl" />
 
             <div className="flex flex-col gap-3 lg:max-w-xs lg:items-end lg:text-right">
+              <WalletConnectButton />
               <Link
                 href="/cases/new"
                 className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-full bg-accent px-5 py-3 text-center font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground shadow-sm transition hover:translate-y-[-1px] hover:shadow-md lg:self-auto"

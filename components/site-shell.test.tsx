@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CaseOverview } from "@/components/cases/case-overview";
 import { ConsentVaultProvider } from "@/components/providers/consent-vault-provider";
+import { GenLayerWalletProvider } from "@/components/providers/genlayer-wallet-provider";
 import { Navigation } from "@/components/navigation";
 import { SiteShell } from "@/components/site-shell";
 import { sampleCases } from "@/lib/sample-data";
@@ -44,9 +45,11 @@ describe("dashboard shell and case overview", () => {
     mockedUsePathname.mockReturnValue("/");
 
     render(
-      <SiteShell>
-        <p>Dashboard child content</p>
-      </SiteShell>,
+      <GenLayerWalletProvider>
+        <SiteShell>
+          <p>Dashboard child content</p>
+        </SiteShell>
+      </GenLayerWalletProvider>,
     );
 
     expect(screen.getByRole("link", { name: /ConsentVault/i })).toBeVisible();
@@ -54,6 +57,7 @@ describe("dashboard shell and case overview", () => {
       "href",
       "/cases/new",
     );
+    expect(screen.getByRole("button", { name: /Install MetaMask/i })).toBeDisabled();
 
     const primaryNav = screen.getByRole("navigation", { name: "Primary" });
 
