@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,31 +12,27 @@ const config: Config = {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        card: "hsl(var(--card))",
-        "card-foreground": "hsl(var(--card-foreground))",
-        muted: "hsl(var(--muted))",
-        "muted-foreground": "hsl(var(--muted-foreground))",
-        accent: "hsl(var(--accent))",
-        "accent-foreground": "hsl(var(--accent-foreground))",
-        border: "hsl(var(--border))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          elevated: "hsl(var(--card-elevated))",
+        },
+        muted: { foreground: "hsl(var(--muted-foreground))" },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        border: {
+          DEFAULT: "hsl(var(--border))",
+          strong: "hsl(var(--border-strong))",
+        },
         ring: "hsl(var(--ring))",
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        danger: "hsl(var(--danger))",
       },
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
-        mono: ["var(--font-mono)", "monospace"],
-      },
-      boxShadow: {
-        dossier: "0 20px 60px rgba(19, 24, 40, 0.12)",
-      },
-      backgroundImage: {
-        grain:
-          "radial-gradient(circle at 1px 1px, rgba(78, 48, 24, 0.08) 1px, transparent 0)",
-      },
-      spacing: {
-        18: "4.5rem",
-      },
-      maxWidth: {
-        dossier: "88rem",
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
     },
   },
