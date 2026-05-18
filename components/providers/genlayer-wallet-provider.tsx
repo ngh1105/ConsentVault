@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   type ConnectedWalletSnapshot,
+  type EthereumProvider,
   GENLAYER_WALLET_NETWORK,
   GENLAYER_WALLET_NETWORK_NAME,
   type WalletConnectionStatus,
@@ -12,6 +13,12 @@ import {
 } from "@/lib/genlayer/wallet";
 
 type GenLayerWalletClient = ReturnType<typeof createGenLayerWalletClient>;
+
+const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+
+function isValidAddress(value: string): value is `0x${string}` {
+  return ADDRESS_RE.test(value);
+}
 
 type GenLayerWalletContextValue = {
   address: string | null;
@@ -48,11 +55,21 @@ async function connectClientToStudionet(client: GenLayerWalletClient) {
   if ("connect" in client && typeof client.connect === "function") {
     try {
       await client.connect("studionet");
-    } catch {
-      // Browser wallets or test providers may not support GenLayer Snap switching yet.
-      // Account connection remains useful for receipt metadata.
+    } catch (caught) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[consentvault] studionet connect failed:", caught);
+      }
     }
   }
+}
+
+function rebuildClientForAccount(
+  provider: EthereumProvider,
+  address: `0x${string}`,
+): GenLayerWalletClient {
+  const next = createGenLayerWalletClient(provider, address);
+  void connectClientToStudionet(next);
+  return next;
 }
 
 export function GenLayerWalletProvider({ children }: React.PropsWithChildren) {
@@ -61,6 +78,14 @@ export function GenLayerWalletProvider({ children }: React.PropsWithChildren) {
   const [client, setClient] = React.useState<GenLayerWalletClient | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<WalletConnectionStatus>("disconnected");
+  const addressRef = React.useRef<string | null>(null);
+  const statusRef = React.useRef<WalletConnectionStatus>("disconnected");
+  React.useEffect(() => {
+    addressRef.current = address;
+  }, [address]);
+  React.useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   React.useEffect(() => {
     if (!getBrowserEthereumProvider()) {
@@ -88,9 +113,13 @@ export function GenLayerWalletProvider({ children }: React.PropsWithChildren) {
         throw new Error("Wallet did not return an account.");
       }
 
-      const accountAddress = nextAddress as `0x${string}`;
-      const nextClient = createGenLayerWalletClient(provider, accountAddress);
-      await connectClientToStudionet(nextClient);
+      if (!isValidAddress(nextAddress)) {
+        setStatus("error");
+        setError("Wallet returned an invalid address.");
+        return;
+      }
+      const accountAddress = nextAddress;
+      const nextClient = rebuildClientForAccount(provider, accountAddress);
 
       const connectedChainId =
         parseChainId(await provider.request({ method: "eth_chainId" })) ??
@@ -114,20 +143,43 @@ export function GenLayerWalletProvider({ children }: React.PropsWithChildren) {
     }
 
     const handleAccountsChanged = (accounts: unknown) => {
-      const nextAddress = firstAccount(accounts);
-      setAddress(nextAddress);
-      setStatus(nextAddress ? "connected" : "disconnected");
+      const next = firstAccount(accounts);
+      if (!next || !isValidAddress(next)) {
+        setAddress(null);
+        setClient(null);
+        setStatus(next ? "error" : "disconnected");
+        setError(next ? "Wallet returned an invalid address." : null);
+        return;
+      }
+      setAddress(next);
+      setClient(rebuildClientForAccount(provider, next));
+      setStatus("connected");
+      setError(null);
     };
+
     const handleChainChanged = (nextChainId: unknown) => {
-      setChainId(parseChainId(nextChainId));
+      const parsed = parseChainId(nextChainId);
+      setChainId(parsed);
+      const currentAddress = addressRef.current;
+      if (currentAddress && isValidAddress(currentAddress)) {
+        setClient(rebuildClientForAccount(provider, currentAddress));
+      }
+    };
+
+    const handleFocus = () => {
+      if (statusRef.current === "missing" && getBrowserEthereumProvider()) {
+        setStatus("disconnected");
+      }
     };
 
     provider.on?.("accountsChanged", handleAccountsChanged);
     provider.on?.("chainChanged", handleChainChanged);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       provider.removeListener?.("accountsChanged", handleAccountsChanged);
       provider.removeListener?.("chainChanged", handleChainChanged);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
