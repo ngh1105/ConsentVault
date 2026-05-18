@@ -36,14 +36,42 @@ function installEthereumMock(accounts: string[] = ["0x1234567890abcdef1234567890
 }
 
 describe("WalletConnectButton", () => {
-  it("shows a missing wallet state when no EIP-1193 provider exists", () => {
+  it("shows a reload action when no EIP-1193 provider exists", () => {
     render(
       <GenLayerWalletProvider>
         <WalletConnectButton />
       </GenLayerWalletProvider>,
     );
 
-    expect(screen.getByRole("button", { name: /Install MetaMask/i })).toBeDisabled();
+    const button = screen.getByRole("button", { name: /Reload after install/i });
+    expect(button).not.toBeDisabled();
+  });
+
+  it("reloads the page when the missing-wallet button is clicked", async () => {
+    const reload = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { ...originalLocation, reload },
+    });
+
+    const user = userEvent.setup();
+
+    try {
+      render(
+        <GenLayerWalletProvider>
+          <WalletConnectButton />
+        </GenLayerWalletProvider>,
+      );
+
+      await user.click(screen.getByRole("button", { name: /Reload after install/i }));
+      expect(reload).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        value: originalLocation,
+      });
+    }
   });
 
   it("connects through the browser wallet and displays the GenLayer account", async () => {

@@ -57,7 +57,7 @@ describe("dashboard shell and case overview", () => {
       "href",
       "/cases/new",
     );
-    expect(screen.getByRole("button", { name: /Install MetaMask/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Reload after install/i })).not.toBeDisabled();
 
     const primaryNav = screen.getByRole("navigation", { name: "Primary" });
 
