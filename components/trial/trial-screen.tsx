@@ -4,9 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, Gavel, Landmark, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
+import { useGenLayerWallet } from "@/components/providers/genlayer-wallet-provider";
 import { ConsensusMeter } from "@/components/trial/consensus-meter";
 import { ValidatorCard } from "@/components/trial/validator-card";
 import type { ConsentCase, ConsentPolicy } from "@/lib/domain";
+import { buildReceiptWalletMetadata } from "@/lib/genlayer/wallet";
 import { runMockTrial } from "@/lib/mock-trial-engine";
 
 type TrialScreenProps = {
@@ -33,24 +35,60 @@ function MissingState({ title, description }: { title: string; description: stri
 
 function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; policy: ConsentPolicy }) {
   const { dispatch, getReceiptByCaseId } = useConsentVault();
+  const { wallet } = useGenLayerWallet();
   const seededReceipt = getReceiptByCaseId(consentCase.id);
-  const [status, setStatus] = React.useState<TrialStatus>("idle");
+  const [status, setStatus] = React.useState<TrialStatus>(seededReceipt ? "complete" : "idle");
   const [result, setResult] = React.useState<Awaited<ReturnType<typeof runMockTrial>> | null>(null);
+
+  const consentCaseRef = React.useRef(consentCase);
+  const policyRef = React.useRef(policy);
+  const walletRef = React.useRef(wallet);
+
+  React.useEffect(() => {
+    consentCaseRef.current = consentCase;
+  }, [consentCase]);
+
+  React.useEffect(() => {
+    policyRef.current = policy;
+  }, [policy]);
+
+  React.useEffect(() => {
+    walletRef.current = wallet;
+  }, [wallet]);
 
   const executeTrial = React.useCallback(async () => {
     setStatus("running");
-    const nextResult = await runMockTrial({ case: consentCase, policy });
+    const nextResult = await runMockTrial({
+      case: consentCaseRef.current,
+      policy: policyRef.current,
+      wallet: buildReceiptWalletMetadata(walletRef.current),
+    });
     setResult(nextResult);
     dispatch({ type: "receipt/save", payload: nextResult.receipt });
     setStatus("complete");
-  }, [consentCase, dispatch, policy]);
+  }, [dispatch]);
+
+  // Auto-run trial once on mount only when no seeded receipt exists for this case.
+  // Depends only on stable IDs so receipt/save dispatch (which derives a new
+  // consentCase reference) does not re-trigger the effect.
+  const caseId = consentCase.id;
+  const policyId = policy.id;
+  const hasSeededReceipt = Boolean(seededReceipt);
 
   React.useEffect(() => {
+    if (hasSeededReceipt) {
+      return;
+    }
+
     let cancelled = false;
 
     async function run() {
       setStatus("running");
-      const nextResult = await runMockTrial({ case: consentCase, policy });
+      const nextResult = await runMockTrial({
+        case: consentCaseRef.current,
+        policy: policyRef.current,
+        wallet: buildReceiptWalletMetadata(walletRef.current),
+      });
 
       if (cancelled) {
         return;
@@ -66,7 +104,7 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
     return () => {
       cancelled = true;
     };
-  }, [consentCase, dispatch, policy]);
+  }, [caseId, policyId, hasSeededReceipt, dispatch]);
 
   const receipt = result?.receipt ?? seededReceipt;
   const judgments = result?.judgments ?? seededReceipt?.judgments ?? [];
@@ -151,6 +189,12 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
                   Case status
                 </dt>
                 <dd className="mt-1 text-foreground">{consentCase.status}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+                  GenLayer issuer
+                </dt>
+                <dd className="mt-1 text-foreground">{receipt?.wallet?.issuerAddress ?? "No wallet attached"}</dd>
               </div>
               <div>
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">

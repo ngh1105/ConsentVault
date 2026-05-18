@@ -60,6 +60,12 @@ export interface VerdictReceipt {
   recommendedAction: string;
   judgments: ValidatorJudgment[];
   createdAt: string;
+  wallet?: {
+    issuerAddress: string;
+    chainId: number;
+    networkName: string;
+    issuedVia: "genlayer-js";
+  };
 }
 
 export interface ConsentVaultState {

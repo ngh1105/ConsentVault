@@ -128,6 +128,24 @@ export function ReceiptCard({ consentCase, policy, receipt }: ReceiptCardProps) 
               </div>
               <div>
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+                  GenLayer issuer
+                </dt>
+                <dd className="archive-overflow-wrap mt-1 text-foreground">
+                  {receipt.wallet?.issuerAddress ?? "No wallet attached"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+                  Network
+                </dt>
+                <dd className="mt-1 text-foreground">
+                  {receipt.wallet
+                    ? `${receipt.wallet.networkName} (${receipt.wallet.chainId})`
+                    : "Mock archive only"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
                   Issued
                 </dt>
                 <dd className="mt-1 text-foreground">{new Date(receipt.createdAt).toLocaleString()}</dd>

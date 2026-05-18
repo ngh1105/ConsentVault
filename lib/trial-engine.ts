@@ -1,8 +1,10 @@
 import type { ConsentCase, ConsentPolicy, ValidatorJudgment, VerdictReceipt } from "@/lib/domain";
+import type { GenLayerWalletMetadata } from "@/lib/genlayer/wallet";
 
 export interface TrialInput {
   case: ConsentCase;
   policy: ConsentPolicy;
+  wallet?: GenLayerWalletMetadata;
 }
 
 export interface TrialResult {
