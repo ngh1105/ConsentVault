@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { fontSans, fontMono } from "./fonts";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { GenLayerWalletProvider } from "@/components/providers/genlayer-wallet-provider";
 import { ConsentVaultProvider } from "@/components/providers/consent-vault-provider";
 import { SiteShell } from "@/components/site-shell";
-
-const display = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
-});
-
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500", "600"],
-});
 
 function resolveSiteUrl(): URL {
   const raw = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
@@ -68,13 +57,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
-      <body>
-        <ConsentVaultProvider>
-          <GenLayerWalletProvider>
-            <SiteShell>{children}</SiteShell>
-          </GenLayerWalletProvider>
-        </ConsentVaultProvider>
+    <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontMono.variable}`}>
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <ThemeProvider>
+          <ConsentVaultProvider>
+            <GenLayerWalletProvider>
+              <SiteShell>{children}</SiteShell>
+            </GenLayerWalletProvider>
+          </ConsentVaultProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
