@@ -188,6 +188,7 @@ export class GenLayerTrialEngine implements TrialEngine {
         address: contractAddress,
         functionName: "run_trial",
         args: [caseJson, policyJson],
+        value: BigInt(0),
       })) as unknown;
 
       if (typeof rawHash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(rawHash)) {

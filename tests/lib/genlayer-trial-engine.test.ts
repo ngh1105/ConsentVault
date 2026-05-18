@@ -104,6 +104,7 @@ describe("GenLayerTrialEngine.runTrial happy path", () => {
       address: TEST_ADDRESS,
       functionName: "run_trial",
       args: [JSON.stringify(impersonationCase), JSON.stringify(restrictivePolicy)],
+      value: BigInt(0),
     });
     expect(waitForTransactionReceipt).toHaveBeenCalledWith({
       hash: TEST_TX_HASH,
