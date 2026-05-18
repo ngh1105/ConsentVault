@@ -74,3 +74,12 @@ export function createGenLayerWalletClient(provider: EthereumProvider) {
     provider,
   });
 }
+
+export function createGenLayerReadClient() {
+  return createClient({
+    chain: GENLAYER_WALLET_NETWORK,
+  });
+}
+
+export type GenLayerWalletClient = ReturnType<typeof createGenLayerWalletClient>;
+export type GenLayerReadClient = ReturnType<typeof createGenLayerReadClient>;

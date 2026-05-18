@@ -9,7 +9,8 @@ import { ConsensusMeter } from "@/components/trial/consensus-meter";
 import { ValidatorCard } from "@/components/trial/validator-card";
 import type { ConsentCase, ConsentPolicy } from "@/lib/domain";
 import { buildReceiptWalletMetadata } from "@/lib/genlayer/wallet";
-import { runMockTrial } from "@/lib/mock-trial-engine";
+import type { TrialResult } from "@/lib/trial-engine";
+import { getTrialEngine } from "@/lib/trial-engine.factory";
 
 type TrialScreenProps = {
   caseId: string;
@@ -35,14 +36,15 @@ function MissingState({ title, description }: { title: string; description: stri
 
 function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; policy: ConsentPolicy }) {
   const { dispatch, getReceiptByCaseId } = useConsentVault();
-  const { wallet } = useGenLayerWallet();
+  const { wallet, client: walletClient } = useGenLayerWallet();
   const seededReceipt = getReceiptByCaseId(consentCase.id);
   const [status, setStatus] = React.useState<TrialStatus>(seededReceipt ? "complete" : "idle");
-  const [result, setResult] = React.useState<Awaited<ReturnType<typeof runMockTrial>> | null>(null);
+  const [result, setResult] = React.useState<TrialResult | null>(null);
 
   const consentCaseRef = React.useRef(consentCase);
   const policyRef = React.useRef(policy);
   const walletRef = React.useRef(wallet);
+  const walletClientRef = React.useRef(walletClient);
 
   React.useEffect(() => {
     consentCaseRef.current = consentCase;
@@ -56,9 +58,14 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
     walletRef.current = wallet;
   }, [wallet]);
 
+  React.useEffect(() => {
+    walletClientRef.current = walletClient;
+  }, [walletClient]);
+
   const executeTrial = React.useCallback(async () => {
     setStatus("running");
-    const nextResult = await runMockTrial({
+    const engine = getTrialEngine({ walletClient: walletClientRef.current });
+    const nextResult = await engine.runTrial({
       case: consentCaseRef.current,
       policy: policyRef.current,
       wallet: buildReceiptWalletMetadata(walletRef.current),
@@ -84,7 +91,8 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
 
     async function run() {
       setStatus("running");
-      const nextResult = await runMockTrial({
+      const engine = getTrialEngine({ walletClient: walletClientRef.current });
+      const nextResult = await engine.runTrial({
         case: consentCaseRef.current,
         policy: policyRef.current,
         wallet: buildReceiptWalletMetadata(walletRef.current),
