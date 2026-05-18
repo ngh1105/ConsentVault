@@ -6,6 +6,7 @@ import { ArrowLeft, Gavel, Landmark, LoaderCircle, RotateCcw, Sparkles } from "l
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
 import { useGenLayerWallet } from "@/components/providers/genlayer-wallet-provider";
 import { ConsensusMeter } from "@/components/trial/consensus-meter";
+import { TrialGuard } from "@/components/trial/trial-guard";
 import { ValidatorCard } from "@/components/trial/validator-card";
 import type { ConsentCase, ConsentPolicy } from "@/lib/domain";
 import { buildReceiptWalletMetadata } from "@/lib/genlayer/wallet";
@@ -16,7 +17,7 @@ type TrialScreenProps = {
   caseId: string;
 };
 
-type TrialStatus = "idle" | "running" | "complete";
+type TrialStatus = "idle" | "running" | "complete" | "error";
 
 function MissingState({ title, description }: { title: string; description: string }) {
   return (
@@ -40,6 +41,7 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
   const seededReceipt = getReceiptByCaseId(consentCase.id);
   const [status, setStatus] = React.useState<TrialStatus>(seededReceipt ? "complete" : "idle");
   const [result, setResult] = React.useState<TrialResult | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const consentCaseRef = React.useRef(consentCase);
   const policyRef = React.useRef(policy);
@@ -64,15 +66,21 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
 
   const executeTrial = React.useCallback(async () => {
     setStatus("running");
-    const engine = getTrialEngine({ walletClient: walletClientRef.current });
-    const nextResult = await engine.runTrial({
-      case: consentCaseRef.current,
-      policy: policyRef.current,
-      wallet: buildReceiptWalletMetadata(walletRef.current),
-    });
-    setResult(nextResult);
-    dispatch({ type: "receipt/save", payload: nextResult.receipt });
-    setStatus("complete");
+    setErrorMessage(null);
+    try {
+      const engine = getTrialEngine({ walletClient: walletClientRef.current });
+      const nextResult = await engine.runTrial({
+        case: consentCaseRef.current,
+        policy: policyRef.current,
+        wallet: buildReceiptWalletMetadata(walletRef.current),
+      });
+      setResult(nextResult);
+      dispatch({ type: "receipt/save", payload: nextResult.receipt });
+      setStatus("complete");
+    } catch (caught) {
+      setErrorMessage(caught instanceof Error ? caught.message : "Trial run failed.");
+      setStatus("error");
+    }
   }, [dispatch]);
 
   // Auto-run trial once on mount only when no seeded receipt exists for this case.
@@ -91,20 +99,29 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
 
     async function run() {
       setStatus("running");
-      const engine = getTrialEngine({ walletClient: walletClientRef.current });
-      const nextResult = await engine.runTrial({
-        case: consentCaseRef.current,
-        policy: policyRef.current,
-        wallet: buildReceiptWalletMetadata(walletRef.current),
-      });
+      setErrorMessage(null);
+      try {
+        const engine = getTrialEngine({ walletClient: walletClientRef.current });
+        const nextResult = await engine.runTrial({
+          case: consentCaseRef.current,
+          policy: policyRef.current,
+          wallet: buildReceiptWalletMetadata(walletRef.current),
+        });
 
-      if (cancelled) {
-        return;
+        if (cancelled) {
+          return;
+        }
+
+        setResult(nextResult);
+        dispatch({ type: "receipt/save", payload: nextResult.receipt });
+        setStatus("complete");
+      } catch (caught) {
+        if (cancelled) {
+          return;
+        }
+        setErrorMessage(caught instanceof Error ? caught.message : "Trial run failed.");
+        setStatus("error");
       }
-
-      setResult(nextResult);
-      dispatch({ type: "receipt/save", payload: nextResult.receipt });
-      setStatus("complete");
     }
 
     void run();
@@ -160,10 +177,23 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
               <p className="text-sm text-muted-foreground">
                 {status === "running"
                   ? "Receipt generation is unfolding across the consensus meter below."
-                  : "Consensus is ready for review and downstream receipt export."}
+                  : status === "error"
+                    ? "The trial engine returned an error. Re-run after resolving the cause."
+                    : "Consensus is ready for review and downstream receipt export."}
               </p>
             </div>
           </div>
+
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-6 rounded-[1.3rem] border border-destructive/40 bg-destructive/10 p-4 text-sm leading-6 text-destructive"
+              data-testid="trial-error-banner"
+            >
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Trial error</p>
+              <p className="mt-2 break-words text-foreground">{errorMessage}</p>
+            </div>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
@@ -280,5 +310,9 @@ export function TrialScreen({ caseId }: TrialScreenProps) {
     );
   }
 
-  return <TrialWorkspace consentCase={consentCase} policy={policy} />;
+  return (
+    <TrialGuard>
+      <TrialWorkspace consentCase={consentCase} policy={policy} />
+    </TrialGuard>
+  );
 }
