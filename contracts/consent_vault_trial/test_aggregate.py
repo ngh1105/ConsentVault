@@ -184,13 +184,15 @@ def test_aggregate_verdict_copy_matches_golden(args, expected):
 def _extract_verdict_copy_from_main():
     main_src = Path(__file__).parent / "main.py"
     tree = ast.parse(main_src.read_text(encoding="utf-8"))
-    for node in tree.body:
+    for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef) and node.name == "_verdict_copy":
             module = ast.Module(body=[node], type_ignores=[])
             namespace: dict = {}
             exec(compile(module, str(main_src), "exec"), namespace)
             return namespace["_verdict_copy"]
-    raise RuntimeError("_verdict_copy not found in main.py")
+    raise RuntimeError(
+        "_verdict_copy not found anywhere in main.py (searched module + nested scopes via ast.walk)"
+    )
 
 
 @pytest.mark.parametrize("args,expected", list(GOLDEN_VERDICT_COPY.items()))
@@ -210,3 +212,38 @@ def test_aggregate_caller_preserves_case_id():
 
     result_without_id = aggregate(judgments, {"id": ""}, {"creatorName": "Acme"})
     assert result_without_id["caseId"] == ""
+
+
+def _find_function_in_main(name: str, *, parent_class: str | None = None) -> ast.FunctionDef:
+    """Find a top-level or class-method FunctionDef in main.py by name.
+
+    If `parent_class` is provided, search only inside that class's body.
+    Raises RuntimeError with diagnostic context if not found.
+    """
+    main_src = Path(__file__).parent / "main.py"
+    tree = ast.parse(main_src.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef) or node.name != name:
+            continue
+        if parent_class is None:
+            return node
+        # Walk the class bodies to confirm parentage.
+        for cls in ast.walk(tree):
+            if isinstance(cls, ast.ClassDef) and cls.name == parent_class:
+                if node in cls.body:
+                    return node
+    where = f"class {parent_class}" if parent_class else "module top level"
+    raise RuntimeError(f"{name!r} not found in main.py ({where})")
+
+
+def test_run_trial_asserts_non_empty_case_id():
+    fn = _find_function_in_main("run_trial", parent_class="ConsentVaultTrial")
+    asserts = [node for node in ast.walk(fn) if isinstance(node, ast.Assert)]
+    case_id_asserts = [
+        a for a in asserts
+        if isinstance(a.test, ast.Name) and a.test.id == "case_id"
+    ]
+    assert case_id_asserts, (
+        "run_trial must contain `assert case_id, ...` to reject empty case ids; "
+        f"found asserts: {[ast.dump(a.test) for a in asserts]}"
+    )

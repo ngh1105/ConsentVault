@@ -140,6 +140,9 @@ def _normalize_judgments(judgments):
     )
 
 
+# NOTE: _verdict_copy is extracted via ast.parse + exec in test_aggregate.py
+# to verify drift against aggregate.py. Keep this function self-contained —
+# do not reference module-level constants or imports inside its body.
 def _verdict_copy(verdict, creator_name, evidence_count, support_count):
     if verdict == "Allowed":
         return (
