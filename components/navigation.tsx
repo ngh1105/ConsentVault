@@ -14,7 +14,7 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary" className="border-ink/10 border-t px-4 py-4 sm:px-6 lg:px-8">
+    <nav aria-label="Primary" className="border-border border-t px-4 py-4 sm:px-6 lg:px-8">
       <ul className="flex flex-wrap items-center gap-2">
         {routes.map((route) => {
           const isActive = route.href === "/" ? pathname === route.href : pathname.startsWith(route.href);
@@ -27,8 +27,8 @@ export function Navigation() {
                 className={cn(
                   "inline-flex rounded-full border px-4 py-2 font-mono text-xs uppercase tracking-[0.22em] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20",
                   isActive
-                    ? "border-accent/20 bg-accent/8 text-foreground"
-                    : "border-transparent text-muted-foreground hover:border-accent/20 hover:bg-accent/8 hover:text-foreground",
+                    ? "border-accent/20 bg-accent/10 text-foreground"
+                    : "border-transparent text-muted-foreground hover:border-accent/20 hover:bg-accent/10 hover:text-foreground",
                 )}
               >
                 {route.label}

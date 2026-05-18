@@ -36,11 +36,11 @@ export function ConsensusMeter({ isRunning = false, receipt }: ConsensusMeterPro
   const citedEvidenceCount = collectCitedEvidenceIds(receipt.judgments).length;
 
   return (
-    <section className="evidence-card p-6 sm:p-7" aria-labelledby="consensus-meter-title">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-7" aria-labelledby="consensus-meter-title">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="metadata-label">Consensus meter</p>
-          <h2 id="consensus-meter-title" className="mt-4 font-display text-4xl font-semibold">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Consensus meter</p>
+          <h2 id="consensus-meter-title" className="mt-4 text-4xl font-semibold">
             {receipt.finalVerdict}
           </h2>
         </div>
@@ -48,7 +48,7 @@ export function ConsensusMeter({ isRunning = false, receipt }: ConsensusMeterPro
           className={cn(
             "rounded-full px-4 py-2 font-mono text-xs uppercase tracking-[0.22em]",
             receipt.finalVerdict === "Impersonation Risk" || receipt.finalVerdict === "Violation"
-              ? "verdict-banner"
+              ? "rounded-3xl border border-border bg-card"
               : "border border-border/80 bg-background/75",
             verdictTone[receipt.finalVerdict],
           )}

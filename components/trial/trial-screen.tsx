@@ -31,9 +31,9 @@ type TrialStatus = "idle" | "running" | "complete" | "error";
 
 function MissingState({ title, description }: { title: string; description: string }) {
   return (
-    <section className="evidence-card p-6 sm:p-8">
-      <p className="metadata-label">Trial unavailable</p>
-      <h1 className="mt-5 font-display text-4xl font-semibold">{title}</h1>
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Trial unavailable</p>
+      <h1 className="mt-5 text-4xl font-semibold">{title}</h1>
       <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">{description}</p>
       <Link
         href="/"

@@ -18,12 +18,12 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
 
   return (
     <section
-      className="evidence-card mx-auto flex w-full max-w-3xl flex-col gap-5 px-5 py-8 sm:px-8 sm:py-10"
+      className="rounded-2xl border border-border bg-card p-5 mx-auto flex w-full max-w-3xl flex-col gap-5 px-5 py-8 sm:px-8 sm:py-10"
       role="alert"
       aria-live="assertive"
     >
       <div className="flex flex-wrap items-center gap-3">
-        <p className="metadata-label">Archive interruption</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Archive interruption</p>
         <span className="inline-flex items-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-destructive">
           <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
           Unexpected error
@@ -56,7 +56,7 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
         </button>
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-ink/10 bg-card/70 px-5 py-3 text-center font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-card/70 px-5 py-3 text-center font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/10"
         >
           Back to dashboard
         </Link>

@@ -4,7 +4,6 @@ import { fontSans, fontMono } from "./fonts";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { GenLayerWalletProvider } from "@/components/providers/genlayer-wallet-provider";
 import { ConsentVaultProvider } from "@/components/providers/consent-vault-provider";
-import { SiteShell } from "@/components/site-shell";
 import { AppShell } from "@/components/shell/app-shell";
 
 function resolveSiteUrl(): URL {

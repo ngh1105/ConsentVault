@@ -116,7 +116,7 @@ export function PolicyForm({
           <button
             type="button"
             onClick={handleBlockedUseSubmit}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/20 bg-accent/8 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/30 hover:bg-accent/12"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/30 hover:bg-accent/12"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             Add clause
@@ -129,7 +129,7 @@ export function PolicyForm({
               <button
                 type="button"
                 onClick={() => onRemoveBlockedUse(item)}
-                className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/8 px-4 py-2 text-sm text-foreground transition hover:border-accent/30 hover:bg-accent/12"
+                className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 text-sm text-foreground transition hover:border-accent/30 hover:bg-accent/12"
                 aria-label={`Remove blocked use ${item}`}
               >
                 <span>{item}</span>
@@ -186,7 +186,7 @@ export function PolicyForm({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center justify-center rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+            className="inline-flex items-center justify-center rounded-full border border-border bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/10"
           >
             Reset draft
           </button>

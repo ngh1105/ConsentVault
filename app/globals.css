@@ -51,8 +51,4 @@
   .text-balance {
     text-wrap: balance;
   }
-  /* Temporary shims to keep build green during transition. Removed in Task 20. */
-  .bg-accent\/6 { background-color: hsl(var(--accent) / 0.06); }
-  .bg-accent\/8 { background-color: hsl(var(--accent) / 0.08); }
-  .border-ink\/10 { border-color: hsl(var(--foreground) / 0.1); }
 }
