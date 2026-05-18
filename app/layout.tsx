@@ -17,10 +17,17 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
+function resolveSiteUrl(): URL {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  try {
+    return new URL(raw || "https://consentvault.local");
+  } catch {
+    return new URL("https://consentvault.local");
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://consentvault.local",
-  ),
+  metadataBase: resolveSiteUrl(),
   title: {
     default: "ConsentVault — AI consent verdict archive",
     template: "%s · ConsentVault",

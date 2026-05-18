@@ -103,7 +103,10 @@ py -m pytest
 
 ## Demo URL
 
-> Replace this line with your Vercel preview URL once deployed.
+Live demo: **https://consentvault.vercel.app**
+
+Studionet contract address (current deploy):
+`0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501`
 
 After running through the steps in [`docs/demo-script.md`](docs/demo-script.md),
 the screenshots in [`docs/screenshots/`](docs/screenshots/) match the live
