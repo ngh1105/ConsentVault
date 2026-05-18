@@ -17,21 +17,20 @@ import { studionet } from "genlayer-js/chains";
 
 const SMOKE_CASE_ID = "__smoke__";
 
+const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+
 function resolveContractAddress() {
   const fromCli = process.argv[2];
   const fromEnv = process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS;
   const candidate = (fromCli ?? fromEnv ?? "").trim();
-  if (!candidate.startsWith("0x")) {
-    return null;
-  }
-  return candidate;
+  return ADDRESS_RE.test(candidate) ? candidate : null;
 }
 
 async function main() {
   const address = resolveContractAddress();
   if (!address) {
     console.error(
-      "[smoke] Missing contract address. Pass it as the first arg or set NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS.",
+      "[smoke] Missing or malformed contract address. Pass a 0x-prefixed 40-hex-char address as the first arg or set NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS.",
     );
     process.exit(2);
   }

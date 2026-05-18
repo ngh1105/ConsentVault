@@ -9,9 +9,11 @@ import { resolveTrialEngineKind } from "@/lib/trial-engine.factory";
 export const GENLAYER_CONTRACT_ADDRESS_HINT =
   "Set NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS in .env.local (see docs/deploy-contract.md).";
 
+const CONTRACT_ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+
 function getConfiguredContractAddress(): string | null {
   const value = (process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS ?? "").trim();
-  return value.startsWith("0x") ? value : null;
+  return CONTRACT_ADDRESS_RE.test(value) ? value : null;
 }
 
 function GuardShell({

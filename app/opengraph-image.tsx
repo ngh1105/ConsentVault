@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { studionet } from "genlayer-js/chains";
 
 export const runtime = "edge";
 export const alt = "ConsentVault — verdict archive for AI content consent disputes";
@@ -19,13 +20,11 @@ export default function OpenGraphImage() {
           background:
             "linear-gradient(135deg, #1c1814 0%, #2b211f 55%, #401a22 100%)",
           color: "#f3ede0",
-          fontFamily: "Georgia, serif",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <span
             style={{
-              fontFamily: "ui-monospace, monospace",
               fontSize: 28,
               letterSpacing: 6,
               textTransform: "uppercase",
@@ -36,7 +35,6 @@ export default function OpenGraphImage() {
           </span>
           <span
             style={{
-              fontFamily: "ui-monospace, monospace",
               fontSize: 22,
               letterSpacing: 4,
               textTransform: "uppercase",
@@ -75,14 +73,13 @@ export default function OpenGraphImage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            fontFamily: "ui-monospace, monospace",
             fontSize: 22,
             letterSpacing: 4,
             textTransform: "uppercase",
             color: "rgba(243, 237, 224, 0.6)",
           }}
         >
-          <span>Studionet · Chain id 61999</span>
+          <span>{`Studionet · Chain id ${studionet.id}`}</span>
           <span>consent · evidence · receipt</span>
         </div>
       </div>
