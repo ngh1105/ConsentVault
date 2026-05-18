@@ -64,40 +64,8 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
     walletClientRef.current = walletClient;
   }, [walletClient]);
 
-  const executeTrial = React.useCallback(async () => {
-    setStatus("running");
-    setErrorMessage(null);
-    try {
-      const engine = getTrialEngine({ walletClient: walletClientRef.current });
-      const nextResult = await engine.runTrial({
-        case: consentCaseRef.current,
-        policy: policyRef.current,
-        wallet: buildReceiptWalletMetadata(walletRef.current),
-      });
-      setResult(nextResult);
-      dispatch({ type: "receipt/save", payload: nextResult.receipt });
-      setStatus("complete");
-    } catch (caught) {
-      setErrorMessage(caught instanceof Error ? caught.message : "Trial run failed.");
-      setStatus("error");
-    }
-  }, [dispatch]);
-
-  // Auto-run trial once on mount only when no seeded receipt exists for this case.
-  // Depends only on stable IDs so receipt/save dispatch (which derives a new
-  // consentCase reference) does not re-trigger the effect.
-  const caseId = consentCase.id;
-  const policyId = policy.id;
-  const hasSeededReceipt = Boolean(seededReceipt);
-
-  React.useEffect(() => {
-    if (hasSeededReceipt) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function run() {
+  const runTrial = React.useCallback(
+    async (cancelledRef: { current: boolean }) => {
       setStatus("running");
       setErrorMessage(null);
       try {
@@ -107,29 +75,40 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
           policy: policyRef.current,
           wallet: buildReceiptWalletMetadata(walletRef.current),
         });
-
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelledRef.current) return;
         setResult(nextResult);
         dispatch({ type: "receipt/save", payload: nextResult.receipt });
         setStatus("complete");
       } catch (caught) {
-        if (cancelled) {
-          return;
-        }
+        if (cancelledRef.current) return;
         setErrorMessage(caught instanceof Error ? caught.message : "Trial run failed.");
         setStatus("error");
       }
-    }
+    },
+    [dispatch],
+  );
 
-    void run();
+  const manualCancelRef = React.useRef({ current: false });
 
+  const executeTrial = React.useCallback(() => {
+    void runTrial(manualCancelRef.current);
+  }, [runTrial]);
+
+  // Auto-run trial once on mount only when no seeded receipt exists for this case.
+  // Depends only on stable IDs so receipt/save dispatch (which derives a new
+  // consentCase reference) does not re-trigger the effect.
+  const caseId = consentCase.id;
+  const policyId = policy.id;
+  const hasSeededReceipt = Boolean(seededReceipt);
+
+  React.useEffect(() => {
+    if (hasSeededReceipt) return;
+    const cancelled = { current: false };
+    void runTrial(cancelled);
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
-  }, [caseId, policyId, hasSeededReceipt, dispatch]);
+  }, [caseId, policyId, hasSeededReceipt, runTrial]);
 
   const receipt = result?.receipt ?? seededReceipt;
   const judgments = result?.judgments ?? seededReceipt?.judgments ?? [];
