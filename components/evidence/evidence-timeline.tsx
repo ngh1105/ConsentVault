@@ -29,11 +29,11 @@ function renderUrl(url: string) {
 
 export function EvidenceTimeline({ evidenceItems }: EvidenceTimelineProps) {
   return (
-    <section className="evidence-card p-6 sm:p-7">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="metadata-label">Evidence timeline</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold">Archive capture log</h2>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Evidence timeline</p>
+          <h2 className="mt-4 text-3xl font-semibold">Archive capture log</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
             Each record preserves source type, capture time, descriptive note, and the original archived URL when it is safe to open.
           </p>
@@ -52,7 +52,7 @@ export function EvidenceTimeline({ evidenceItems }: EvidenceTimelineProps) {
             <div className="flex flex-wrap items-start justify-between gap-3 pl-6 sm:pl-8">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-accent/15 bg-accent/8 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent">
+                  <span className="rounded-full border border-accent/15 bg-accent/10 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent">
                     {item.type}
                   </span>
                   <span className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-muted-foreground">

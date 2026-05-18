@@ -133,7 +133,7 @@ export function IntakeForm({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center justify-center rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+            className="inline-flex items-center justify-center rounded-full border border-border bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/10"
           >
             Reset intake
           </button>

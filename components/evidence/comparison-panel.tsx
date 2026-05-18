@@ -36,11 +36,11 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
   const panelId = useId();
 
   return (
-    <section className="evidence-card p-6 sm:p-7">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="metadata-label">Source comparison</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold">Original record versus generated output</h2>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Source comparison</p>
+          <h2 className="mt-4 text-3xl font-semibold">Original record versus generated output</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
             Read the creator&apos;s original material against the disputed synthetic output without leaving the archive case file.
           </p>
@@ -66,8 +66,8 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
               className={cn(
                 "rounded-full border px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.22em] transition focus-visible:outline-none",
                 isActive
-                  ? "border-accent/20 bg-accent/8 text-foreground"
-                  : "border-border/80 bg-background/65 text-muted-foreground hover:border-accent/20 hover:bg-accent/6 hover:text-foreground",
+                  ? "border-accent/20 bg-accent/10 text-foreground"
+                  : "border-border/80 bg-background/65 text-muted-foreground hover:border-accent/20 hover:bg-accent/10 hover:text-foreground",
               )}
             >
               {pane.label}
@@ -95,7 +95,7 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
                 <ScrollText className="h-4 w-4" aria-hidden="true" />
                 <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">{pane.label}</p>
               </div>
-              <h3 className="mt-3 font-display text-2xl font-semibold">{pane.heading}</h3>
+              <h3 className="mt-3 text-2xl font-semibold">{pane.heading}</h3>
               <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-foreground">{pane.body(consentCase)}</p>
             </article>
           );
@@ -109,7 +109,7 @@ export function ComparisonPanel({ consentCase }: ComparisonPanelProps) {
               <ScrollText className="h-4 w-4" aria-hidden="true" />
               <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">{pane.label}</p>
             </div>
-            <h3 className="mt-3 font-display text-2xl font-semibold">{pane.heading}</h3>
+            <h3 className="mt-3 text-2xl font-semibold">{pane.heading}</h3>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-foreground">{pane.body(consentCase)}</p>
           </article>
         ))}

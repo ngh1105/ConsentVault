@@ -12,10 +12,10 @@ type CaseCardProps = {
 
 export function CaseCard({ consentCase, policy, receipt }: CaseCardProps) {
   return (
-    <article className="evidence-card flex h-full flex-col p-5 sm:p-6">
+    <article className="rounded-2xl border border-border bg-card p-5 flex h-full flex-col sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-3">
-          <p className="metadata-label">Case file</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Case file</p>
           <div>
             <h3 className="font-display text-2xl leading-tight text-balance">{consentCase.title}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{consentCase.notes}</p>
@@ -41,7 +41,7 @@ export function CaseCard({ consentCase, policy, receipt }: CaseCardProps) {
         </div>
       </div>
 
-      <div className="ledger-divider my-5" />
+      <div className="my-5 border-t border-border" />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-[1.35rem] border border-border/75 bg-card/75 p-4">

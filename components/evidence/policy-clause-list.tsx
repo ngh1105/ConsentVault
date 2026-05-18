@@ -14,9 +14,9 @@ type PolicyClauseListProps = {
 export function PolicyClauseList({ policy, matchedClauses, consentCase }: PolicyClauseListProps) {
   if (!policy) {
     return (
-      <section className="evidence-card p-6">
-        <p className="metadata-label">Policy unavailable</p>
-        <h2 className="mt-4 font-display text-3xl font-semibold">No creator policy was linked to this evidence file.</h2>
+      <section className="rounded-2xl border border-border bg-card p-6">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Policy unavailable</p>
+        <h2 className="mt-4 text-3xl font-semibold">No creator policy was linked to this evidence file.</h2>
         <p className="mt-4 text-sm leading-6 text-muted-foreground">
           The workspace can still display the dispute record, but clause matching is unavailable until the case is linked to a policy.
         </p>
@@ -25,11 +25,11 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
   }
 
   return (
-    <section className="evidence-card p-6 sm:p-7">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="metadata-label">Clause review</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold">Blocked-use ledger</h2>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Clause review</p>
+          <h2 className="mt-4 text-3xl font-semibold">Blocked-use ledger</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
             {consentCase.title} is checked against every blocked clause in {policy.creatorName}&apos;s archived policy.
           </p>
@@ -38,7 +38,7 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <article className="rounded-[1.6rem] border border-accent/20 bg-accent/6 p-5">
+        <article className="rounded-[1.6rem] border border-accent/20 bg-accent/10 p-5">
           <div className="flex items-center gap-2 text-accent">
             <Link2 className="h-4 w-4" aria-hidden="true" />
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Matched clauses</p>
@@ -76,7 +76,7 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
                   className={cn(
                     "rounded-[1.2rem] border px-4 py-3 text-sm leading-6 transition-colors",
                     isMatch
-                      ? "border-accent/25 bg-accent/8 text-foreground shadow-sm"
+                      ? "border-accent/25 bg-accent/10 text-foreground shadow-sm"
                       : "border-border/70 bg-card/75 text-muted-foreground",
                   )}
                 >
