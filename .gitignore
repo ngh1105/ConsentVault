@@ -8,3 +8,9 @@ test-results
 *.tsbuildinfo
 .claude/
 .playwright-mcp/
+
+# Python (contract dev)
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
