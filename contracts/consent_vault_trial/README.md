@@ -100,3 +100,17 @@ The returned JSON object has this shape:
 
 The frontend wraps this with case timestamp + connected-wallet metadata to
 build the final `VerdictReceipt`.
+
+## Drift policy
+
+The TypeScript `lib/mock-trial-engine.ts` and the Python contract aggregator
+(`main.py` + `aggregate.py`) are independent implementations.
+
+- The mock engine is the offline demo fixture, served when
+  `NEXT_PUBLIC_TRIAL_ENGINE` is unset.
+- The contract is canonical when `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`.
+- Receipt JSON may differ between the two paths — this is intentional for the
+  hybrid MVP.
+- The parity test in `test_aggregate.py` verifies only that `main.py` and
+  `aggregate.py` agree on verdict copy. TS ↔ Python drift is allowed and
+  re-evaluated after the demo.
