@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
@@ -11,6 +13,11 @@ const navItems = [
 ];
 
 export function AppTopBar() {
+  const mobileNavRef = React.useRef<HTMLDetailsElement>(null);
+  const closeMobileNav = () => {
+    mobileNavRef.current?.removeAttribute("open");
+  };
+
   return (
     <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between gap-6 px-6 md:px-10">
@@ -34,7 +41,7 @@ export function AppTopBar() {
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <WalletConnectButton />
-          <details className="relative md:hidden">
+          <details ref={mobileNavRef} className="relative md:hidden">
             <summary
               aria-label="Open navigation"
               className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-card-elevated [&::-webkit-details-marker]:hidden"
@@ -49,6 +56,7 @@ export function AppTopBar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={closeMobileNav}
                   className="rounded-md px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:bg-card-elevated hover:text-foreground"
                 >
                   {item.label}
