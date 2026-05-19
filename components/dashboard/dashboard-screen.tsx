@@ -33,8 +33,8 @@ export function DashboardScreen() {
 
   const verdictReadyCount = cases.filter((c) => c.status === "Verdict Ready").length;
   const visibleCases = cases
-    .slice(0, 3)
-    .filter((consentCase) => policyById.has(consentCase.policyId));
+    .filter((consentCase) => policyById.has(consentCase.policyId))
+    .slice(0, 3);
 
   const rows: CaseRow[] = React.useMemo(
     () =>

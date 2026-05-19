@@ -30,7 +30,6 @@ export function ProgressRail({ steps }: { steps: ProgressStep[] }) {
             ) : (
               <Link
                 href={step.href}
-                aria-current={step.state === "current" ? "step" : undefined}
                 className={`flex items-center gap-2 transition-colors ${
                   step.state === "current" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}

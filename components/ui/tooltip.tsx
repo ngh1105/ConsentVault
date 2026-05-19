@@ -2,11 +2,15 @@
 
 import * as React from "react";
 
-export function Tooltip({ content, children }: { content: string; children: React.ReactNode }) {
+export function Tooltip({
+  content,
+  children,
+}: {
+  content: string;
+  children: React.ReactElement<{ "aria-describedby"?: string }>;
+}) {
   const tooltipId = React.useId();
-  const child = React.Children.only(children) as React.ReactElement<{
-    "aria-describedby"?: string;
-  }>;
+  const child = React.Children.only(children);
   const existingDescribedBy = child.props["aria-describedby"];
   const describedBy = existingDescribedBy
     ? `${existingDescribedBy} ${tooltipId}`

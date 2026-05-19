@@ -23,7 +23,7 @@ export function DataTable<T>({
       const id = (row as { id?: unknown }).id;
       if (typeof id === "string" || typeof id === "number") return String(id);
     }
-    return JSON.stringify(row);
+    return String(index);
   };
   return (
     <div className="overflow-hidden rounded-2xl border border-border">

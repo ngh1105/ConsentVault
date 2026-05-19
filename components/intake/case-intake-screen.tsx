@@ -91,7 +91,7 @@ export function CaseIntakeScreen() {
         payload: preparedSubmission,
       });
 
-      await router.push(`/cases/${caseId}`);
+      router.push(`/cases/${caseId}`);
     } catch (error) {
       setIsSubmitting(false);
       throw error;
