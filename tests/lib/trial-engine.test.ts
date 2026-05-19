@@ -61,6 +61,26 @@ describe("runMockTrial", () => {
     expect(result.receipt.score).toBeGreaterThanOrEqual(0);
     expect(result.receipt.score).toBeLessThanOrEqual(100);
   });
+
+  it("attaches connected GenLayer wallet metadata to generated receipts", async () => {
+    const result = await runMockTrial({
+      case: impersonationCase,
+      policy: restrictivePolicy,
+      wallet: {
+        issuerAddress: "0x1234567890abcdef1234567890abcdef12345678",
+        chainId: 61999,
+        networkName: "Genlayer Studio Network",
+        issuedVia: "genlayer-js",
+      },
+    });
+
+    expect(result.receipt.wallet).toEqual({
+      issuerAddress: "0x1234567890abcdef1234567890abcdef12345678",
+      chainId: 61999,
+      networkName: "Genlayer Studio Network",
+      issuedVia: "genlayer-js",
+    });
+  });
 });
 
 describe("aggregateVerdict", () => {

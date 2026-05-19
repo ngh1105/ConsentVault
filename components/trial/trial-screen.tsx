@@ -4,16 +4,20 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, Gavel, Landmark, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
+import { useGenLayerWallet } from "@/components/providers/genlayer-wallet-provider";
 import { ConsensusMeter } from "@/components/trial/consensus-meter";
+import { TrialGuard } from "@/components/trial/trial-guard";
 import { ValidatorCard } from "@/components/trial/validator-card";
 import type { ConsentCase, ConsentPolicy } from "@/lib/domain";
-import { runMockTrial } from "@/lib/mock-trial-engine";
+import { buildReceiptWalletMetadata } from "@/lib/genlayer/wallet";
+import type { TrialResult } from "@/lib/trial-engine";
+import { getTrialEngine } from "@/lib/trial-engine.factory";
 
 type TrialScreenProps = {
   caseId: string;
 };
 
-type TrialStatus = "idle" | "running" | "complete";
+type TrialStatus = "idle" | "running" | "complete" | "error";
 
 function MissingState({ title, description }: { title: string; description: string }) {
   return (
@@ -33,40 +37,78 @@ function MissingState({ title, description }: { title: string; description: stri
 
 function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; policy: ConsentPolicy }) {
   const { dispatch, getReceiptByCaseId } = useConsentVault();
+  const { wallet, client: walletClient } = useGenLayerWallet();
   const seededReceipt = getReceiptByCaseId(consentCase.id);
-  const [status, setStatus] = React.useState<TrialStatus>("idle");
-  const [result, setResult] = React.useState<Awaited<ReturnType<typeof runMockTrial>> | null>(null);
+  const [status, setStatus] = React.useState<TrialStatus>(seededReceipt ? "complete" : "idle");
+  const [result, setResult] = React.useState<TrialResult | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const executeTrial = React.useCallback(async () => {
-    setStatus("running");
-    const nextResult = await runMockTrial({ case: consentCase, policy });
-    setResult(nextResult);
-    dispatch({ type: "receipt/save", payload: nextResult.receipt });
-    setStatus("complete");
-  }, [consentCase, dispatch, policy]);
+  const consentCaseRef = React.useRef(consentCase);
+  const policyRef = React.useRef(policy);
+  const walletRef = React.useRef(wallet);
+  const walletClientRef = React.useRef(walletClient);
 
   React.useEffect(() => {
-    let cancelled = false;
+    consentCaseRef.current = consentCase;
+  }, [consentCase]);
 
-    async function run() {
+  React.useEffect(() => {
+    policyRef.current = policy;
+  }, [policy]);
+
+  React.useEffect(() => {
+    walletRef.current = wallet;
+  }, [wallet]);
+
+  React.useEffect(() => {
+    walletClientRef.current = walletClient;
+  }, [walletClient]);
+
+  const runTrial = React.useCallback(
+    async (cancelledRef: { current: boolean }) => {
       setStatus("running");
-      const nextResult = await runMockTrial({ case: consentCase, policy });
-
-      if (cancelled) {
-        return;
+      setErrorMessage(null);
+      try {
+        const engine = getTrialEngine({ walletClient: walletClientRef.current });
+        const nextResult = await engine.runTrial({
+          case: consentCaseRef.current,
+          policy: policyRef.current,
+          wallet: buildReceiptWalletMetadata(walletRef.current),
+        });
+        if (cancelledRef.current) return;
+        setResult(nextResult);
+        dispatch({ type: "receipt/save", payload: nextResult.receipt });
+        setStatus("complete");
+      } catch (caught) {
+        if (cancelledRef.current) return;
+        setErrorMessage(caught instanceof Error ? caught.message : "Trial run failed.");
+        setStatus("error");
       }
+    },
+    [dispatch],
+  );
 
-      setResult(nextResult);
-      dispatch({ type: "receipt/save", payload: nextResult.receipt });
-      setStatus("complete");
-    }
+  const manualCancelRef = React.useRef({ current: false });
 
-    void run();
+  const executeTrial = React.useCallback(() => {
+    void runTrial(manualCancelRef.current);
+  }, [runTrial]);
 
+  // Auto-run trial once on mount only when no seeded receipt exists for this case.
+  // Depends only on stable IDs so receipt/save dispatch (which derives a new
+  // consentCase reference) does not re-trigger the effect.
+  const caseId = consentCase.id;
+  const policyId = policy.id;
+  const hasSeededReceipt = Boolean(seededReceipt);
+
+  React.useEffect(() => {
+    if (hasSeededReceipt) return;
+    const cancelled = { current: false };
+    void runTrial(cancelled);
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
-  }, [consentCase, dispatch, policy]);
+  }, [caseId, policyId, hasSeededReceipt, runTrial]);
 
   const receipt = result?.receipt ?? seededReceipt;
   const judgments = result?.judgments ?? seededReceipt?.judgments ?? [];
@@ -114,10 +156,23 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
               <p className="text-sm text-muted-foreground">
                 {status === "running"
                   ? "Receipt generation is unfolding across the consensus meter below."
-                  : "Consensus is ready for review and downstream receipt export."}
+                  : status === "error"
+                    ? "The trial engine returned an error. Re-run after resolving the cause."
+                    : "Consensus is ready for review and downstream receipt export."}
               </p>
             </div>
           </div>
+
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-6 rounded-[1.3rem] border border-destructive/40 bg-destructive/10 p-4 text-sm leading-6 text-destructive"
+              data-testid="trial-error-banner"
+            >
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Trial error</p>
+              <p className="mt-2 break-words text-foreground">{errorMessage}</p>
+            </div>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
@@ -151,6 +206,12 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
                   Case status
                 </dt>
                 <dd className="mt-1 text-foreground">{consentCase.status}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+                  GenLayer issuer
+                </dt>
+                <dd className="mt-1 text-foreground">{receipt?.wallet?.issuerAddress ?? "No wallet attached"}</dd>
               </div>
               <div>
                 <dt className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
@@ -228,5 +289,9 @@ export function TrialScreen({ caseId }: TrialScreenProps) {
     );
   }
 
-  return <TrialWorkspace consentCase={consentCase} policy={policy} />;
+  return (
+    <TrialGuard>
+      <TrialWorkspace consentCase={consentCase} policy={policy} />
+    </TrialGuard>
+  );
 }

@@ -45,8 +45,11 @@ for (const workflowPage of workflowPages) {
     });
 
     await expect(control).toBeVisible();
-    if (workflowPage.path === "/cases/case-voice-clone/receipt") {
-      await expect(control).toBeEnabled();
+    if (
+      workflowPage.path === "/cases/case-voice-clone/receipt" ||
+      workflowPage.path === "/cases/case-voice-clone/trial"
+    ) {
+      await expect(control).toBeEnabled({ timeout: 15_000 });
     }
     await control.focus();
     await expect(control).toBeFocused();

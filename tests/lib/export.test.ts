@@ -8,6 +8,20 @@ describe("receiptToJson", () => {
     expect(receiptToJson(sampleReceipt)).toContain('\n  "caseId":');
   });
 
+  it("includes optional GenLayer wallet metadata in JSON exports", () => {
+    expect(
+      receiptToJson({
+        ...sampleReceipt,
+        wallet: {
+          issuerAddress: "0x1234567890abcdef1234567890abcdef12345678",
+          chainId: 61999,
+          networkName: "Genlayer Studio Network",
+          issuedVia: "genlayer-js",
+        },
+      }),
+    ).toContain('"issuedVia": "genlayer-js"');
+  });
+
   it("round-trips the receipt payload through JSON parsing", () => {
     expect(JSON.parse(receiptToJson(sampleReceipt))).toEqual(sampleReceipt);
   });

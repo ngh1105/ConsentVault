@@ -76,7 +76,12 @@ export function collectCitedEvidence(
   return evidenceItems.filter((item) => citedIds.has(item.id));
 }
 
-export function aggregateVerdict({ case: consentCase, policy, judgments }: AggregateVerdictInput): VerdictReceipt {
+export function aggregateVerdict({
+  case: consentCase,
+  policy,
+  judgments,
+  wallet,
+}: AggregateVerdictInput): VerdictReceipt {
   if (judgments.length === 0) {
     throw new Error("aggregateVerdict requires at least one validator judgment");
   }
@@ -124,5 +129,6 @@ export function aggregateVerdict({ case: consentCase, policy, judgments }: Aggre
     recommendedAction: verdictCopy[finalVerdict].recommendedAction(policy.creatorName),
     judgments,
     createdAt: consentCase.createdAt,
+    wallet,
   };
 }

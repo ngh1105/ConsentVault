@@ -97,21 +97,46 @@ export function DashboardScreen() {
         </div>
 
         <div className="grid gap-4 xl:grid-cols-2">
-          {visibleCases.map((consentCase) => {
-            const policy = getPolicyById(consentCase.policyId);
-            if (!policy) {
-              return null;
-            }
+          {visibleCases.length > 0 ? (
+            visibleCases.map((consentCase) => {
+              const policy = getPolicyById(consentCase.policyId);
+              if (!policy) {
+                return null;
+              }
 
-            return (
-              <CaseCard
-                key={consentCase.id}
-                consentCase={consentCase}
-                policy={policy}
-                receipt={getReceiptByCaseId(consentCase.id)}
-              />
-            );
-          })}
+              return (
+                <CaseCard
+                  key={consentCase.id}
+                  consentCase={consentCase}
+                  policy={policy}
+                  receipt={getReceiptByCaseId(consentCase.id)}
+                />
+              );
+            })
+          ) : (
+            <div
+              className="evidence-card col-span-full flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+              data-testid="dashboard-empty-state"
+            >
+              <div>
+                <p className="metadata-label">No cases yet</p>
+                <h3 className="mt-3 font-display text-2xl font-semibold">
+                  The archive is empty.
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+                  Create the first dispute to populate the case ledger. Sample
+                  policies stay available so the trial flow can run end-to-end.
+                </p>
+              </div>
+              <Link
+                href="/cases/new"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground transition hover:translate-y-[-1px] hover:shadow-md"
+              >
+                Open new case intake
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
