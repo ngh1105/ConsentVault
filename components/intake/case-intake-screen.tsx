@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   buildEvidenceBundlePreview,
@@ -72,7 +72,9 @@ export function CaseIntakeScreen() {
     setValues(createEmptyIntakeForm(selectedPolicy.id));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (isSubmitting) {
       return;
     }
@@ -99,127 +101,129 @@ export function CaseIntakeScreen() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16 md:px-10">
       <h1 className="text-3xl font-semibold tracking-tight text-foreground">New case</h1>
-      <div className="mt-8 flex flex-col gap-12">
-        <Section title="Case info">
-          <label className="block space-y-2" htmlFor="intake-policy">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              Creator policy
-            </span>
-            <select
-              id="intake-policy"
-              value={values.policyId}
-              onChange={(event) => handleFieldChange("policyId", event.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
-              required
-            >
-              {policies.map((policy) => (
-                <option key={policy.id} value={policy.id}>
-                  {policy.creatorName} ({policy.creatorHandle})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block space-y-2" htmlFor="intake-title">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              Suspicious content title
-            </span>
-            <input
-              id="intake-title"
-              value={values.title}
-              onChange={(event) => handleFieldChange("title", event.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
-              placeholder="Voice clone dispute"
-              required
-            />
-          </label>
-        </Section>
+      <form onSubmit={handleSubmit} noValidate={false}>
+        <div className="mt-8 flex flex-col gap-12">
+          <Section title="Case info">
+            <label className="block space-y-2" htmlFor="intake-policy">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Creator policy
+              </span>
+              <select
+                id="intake-policy"
+                value={values.policyId}
+                onChange={(event) => handleFieldChange("policyId", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                required
+              >
+                {policies.map((policy) => (
+                  <option key={policy.id} value={policy.id}>
+                    {policy.creatorName} ({policy.creatorHandle})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block space-y-2" htmlFor="intake-title">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Suspicious content title
+              </span>
+              <input
+                id="intake-title"
+                value={values.title}
+                onChange={(event) => handleFieldChange("title", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="Voice clone dispute"
+                required
+              />
+            </label>
+          </Section>
 
-        <Section title="Original content">
-          <label className="block space-y-2" htmlFor="intake-source-url">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              Original source URL
-            </span>
-            <input
-              id="intake-source-url"
-              type="url"
-              value={values.sourceUrl}
-              onChange={(event) => handleFieldChange("sourceUrl", event.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
-              placeholder="https://creator.example/source"
-              required
-            />
-          </label>
-        </Section>
+          <Section title="Original content">
+            <label className="block space-y-2" htmlFor="intake-source-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Original source URL
+              </span>
+              <input
+                id="intake-source-url"
+                type="url"
+                value={values.sourceUrl}
+                onChange={(event) => handleFieldChange("sourceUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://creator.example/source"
+                required
+              />
+            </label>
+          </Section>
 
-        <Section title="AI output">
-          <label className="block space-y-2" htmlFor="intake-ai-output-url">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              AI output URL
-            </span>
-            <input
-              id="intake-ai-output-url"
-              type="url"
-              value={values.aiOutputUrl}
-              onChange={(event) => handleFieldChange("aiOutputUrl", event.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
-              placeholder="https://platform.example/output"
-              required
-            />
-          </label>
-        </Section>
+          <Section title="AI output">
+            <label className="block space-y-2" htmlFor="intake-ai-output-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                AI output URL
+              </span>
+              <input
+                id="intake-ai-output-url"
+                type="url"
+                value={values.aiOutputUrl}
+                onChange={(event) => handleFieldChange("aiOutputUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://platform.example/output"
+                required
+              />
+            </label>
+          </Section>
 
-        <Section title="Source links">
-          <label className="block space-y-2" htmlFor="intake-platform-url">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              Platform URL
-            </span>
-            <input
-              id="intake-platform-url"
-              type="url"
-              value={values.platformUrl}
-              onChange={(event) => handleFieldChange("platformUrl", event.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
-              placeholder="https://platform.example/post"
-              required
-            />
-          </label>
-        </Section>
+          <Section title="Source links">
+            <label className="block space-y-2" htmlFor="intake-platform-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Platform URL
+              </span>
+              <input
+                id="intake-platform-url"
+                type="url"
+                value={values.platformUrl}
+                onChange={(event) => handleFieldChange("platformUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://platform.example/post"
+                required
+              />
+            </label>
+          </Section>
 
-        <Section title="Notes">
-          <label className="block space-y-2" htmlFor="intake-notes">
-            <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
-              Intake notes
-            </span>
-            <textarea
-              id="intake-notes"
-              value={values.notes}
-              onChange={(event) => handleFieldChange("notes", event.target.value)}
-              className="min-h-32 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm leading-6 text-foreground"
-              placeholder="Why does this look suspicious, deceptive, or out of policy?"
-            />
-          </label>
-        </Section>
-      </div>
-
-      <div className="sticky bottom-0 mt-12 -mx-6 border-t border-border bg-background/90 px-6 py-4 backdrop-blur-md md:-mx-10 md:px-10">
-        <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={handleReset}
-            className="inline-flex h-10 items-center rounded-full border border-border bg-card px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:bg-card-elevated"
-          >
-            Save draft
-          </button>
-          <button
-            type="button"
-            onClick={() => { void handleSubmit(); }}
-            disabled={isSubmitting}
-            className="inline-flex h-10 items-center rounded-full bg-[hsl(350_80%_44%)] px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting ? "Opening case" : "Open draft case"}
-          </button>
+          <Section title="Notes">
+            <label className="block space-y-2" htmlFor="intake-notes">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Intake notes
+              </span>
+              <textarea
+                id="intake-notes"
+                value={values.notes}
+                onChange={(event) => handleFieldChange("notes", event.target.value)}
+                className="min-h-32 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm leading-6 text-foreground"
+                placeholder="Why does this look suspicious, deceptive, or out of policy?"
+              />
+            </label>
+          </Section>
         </div>
-      </div>
+
+        <div className="sticky bottom-0 mt-12 -mx-6 border-t border-border bg-background/90 px-6 py-4 backdrop-blur-md md:-mx-10 md:px-10">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleReset}
+              aria-label="Clear form fields"
+              className="inline-flex h-10 items-center rounded-full border border-border bg-card px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:bg-card-elevated"
+            >
+              Reset
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex h-10 items-center rounded-full bg-[hsl(350_80%_44%)] px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? "Opening case" : "Open draft case"}
+            </button>
+          </div>
+        </div>
+      </form>
 
       <div className="mt-8">
         <EvidenceBundlePreview items={previewItems} />

@@ -202,7 +202,8 @@ export function ReceiptScreen({ caseId }: ReceiptScreenProps) {
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6">
-        <p className="text-sm text-muted-foreground">{receipt.summary}</p>
+        <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Summary</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{receipt.summary}</p>
       </section>
 
       <details className="rounded-2xl border border-border bg-card">

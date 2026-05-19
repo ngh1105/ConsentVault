@@ -8,6 +8,9 @@ type EvidenceBundlePreviewProps = {
 export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
   const hasExactPreviewCount = items.length === 3;
   const isEmpty = items.length === 0;
+  const headline = isEmpty
+    ? "No records yet"
+    : `${items.length} record${items.length === 1 ? "" : "s"} ready to file`;
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
@@ -15,7 +18,7 @@ export function EvidenceBundlePreview({ items }: EvidenceBundlePreviewProps) {
         <FileArchive className="h-5 w-5 text-accent" aria-hidden="true" />
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Evidence bundle preview</p>
-          <h2 className="mt-3 text-3xl font-semibold">Three records ready to file</h2>
+          <h2 className="mt-3 text-3xl font-semibold">{headline}</h2>
         </div>
       </div>
 

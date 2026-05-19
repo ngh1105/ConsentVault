@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { WalletConnectButton } from "@/components/wallet/wallet-connect-button";
 
@@ -19,7 +20,7 @@ export function AppTopBar() {
         >
           ConsentVault
         </Link>
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -33,6 +34,28 @@ export function AppTopBar() {
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <WalletConnectButton />
+          <details className="relative md:hidden">
+            <summary
+              aria-label="Open navigation"
+              className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-card-elevated [&::-webkit-details-marker]:hidden"
+            >
+              <Menu className="h-4 w-4" aria-hidden="true" />
+            </summary>
+            <nav
+              aria-label="Mobile"
+              className="absolute right-0 top-12 z-50 flex w-48 flex-col gap-1 rounded-2xl border border-border bg-card p-2 shadow-lg"
+            >
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-md px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:bg-card-elevated hover:text-foreground"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </details>
         </div>
       </div>
     </header>

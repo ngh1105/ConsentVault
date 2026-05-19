@@ -18,6 +18,11 @@ const captures = [
     waitFor: "Voice clone dispute",
   },
   {
+    file: "06-trial.png",
+    path: "/cases/case-voice-clone/trial",
+    waitFor: "Voice clone dispute",
+  },
+  {
     file: "07-receipt.png",
     path: "/cases/case-voice-clone/receipt",
     waitFor: "Violation",

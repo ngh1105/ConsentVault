@@ -17,6 +17,8 @@ export function CommandPalette() {
 
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (target?.matches?.('input, textarea, [contenteditable="true"]')) return;
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((v) => !v);

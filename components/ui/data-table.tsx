@@ -8,14 +8,23 @@ export interface Column<T> {
 }
 
 export function DataTable<T>({
-  columns, rows, onRowClick, emptyState,
+  columns, rows, onRowClick, emptyState, getRowId,
 }: {
   columns: Column<T>[];
   rows: T[];
   onRowClick?: (row: T) => void;
   emptyState?: React.ReactNode;
+  getRowId?: (row: T, index: number) => string;
 }) {
   if (rows.length === 0 && emptyState) return <>{emptyState}</>;
+  const resolveRowKey = (row: T, index: number): string => {
+    if (getRowId) return getRowId(row, index);
+    if (row && typeof row === "object" && "id" in row) {
+      const id = (row as { id?: unknown }).id;
+      if (typeof id === "string" || typeof id === "number") return String(id);
+    }
+    return JSON.stringify(row);
+  };
   return (
     <div className="overflow-hidden rounded-2xl border border-border">
       <table className="w-full text-left text-sm">
@@ -34,7 +43,7 @@ export function DataTable<T>({
         <tbody>
           {rows.map((row, idx) => (
             <tr
-              key={idx}
+              key={resolveRowKey(row, idx)}
               onClick={() => onRowClick?.(row)}
               className={`border-t border-border transition-colors ${onRowClick ? "cursor-pointer hover:bg-card-elevated" : ""}`}
             >

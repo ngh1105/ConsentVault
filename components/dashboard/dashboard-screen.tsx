@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
 import { MeshGradient } from "@/components/ui/mesh-gradient";
@@ -19,21 +20,34 @@ const columns: Column<CaseRow>[] = [
 ];
 
 export function DashboardScreen() {
-  const { cases, receipts, getPolicyById, getReceiptByCaseId } = useConsentVault();
+  const { cases, receipts, policies } = useConsentVault();
+
+  const policyById = React.useMemo(
+    () => new Map(policies.map((policy) => [policy.id, policy])),
+    [policies],
+  );
+  const receiptByCaseId = React.useMemo(
+    () => new Map(receipts.map((receipt) => [receipt.caseId, receipt])),
+    [receipts],
+  );
 
   const verdictReadyCount = cases.filter((c) => c.status === "Verdict Ready").length;
   const visibleCases = cases.slice(0, 3);
 
-  const rows: CaseRow[] = cases.map((c) => {
-    const receipt = getReceiptByCaseId(c.id);
-    return {
-      id: c.id,
-      title: c.title,
-      verdict: receipt?.finalVerdict ?? c.status,
-      score: receipt?.score ?? 0,
-      date: new Date(c.createdAt).toLocaleDateString(),
-    };
-  });
+  const rows: CaseRow[] = React.useMemo(
+    () =>
+      cases.map((c) => {
+        const receipt = receiptByCaseId.get(c.id);
+        return {
+          id: c.id,
+          title: c.title,
+          verdict: receipt?.finalVerdict ?? c.status,
+          score: receipt?.score ?? 0,
+          date: new Date(c.createdAt).toLocaleDateString(),
+        };
+      }),
+    [cases, receiptByCaseId],
+  );
 
   return (
     <div>
@@ -93,14 +107,14 @@ export function DashboardScreen() {
           <div className="mt-4 grid gap-4 xl:grid-cols-2">
             {visibleCases.length > 0 ? (
               visibleCases.map((consentCase) => {
-                const policy = getPolicyById(consentCase.policyId);
+                const policy = policyById.get(consentCase.policyId);
                 if (!policy) return null;
                 return (
                   <CaseCard
                     key={consentCase.id}
                     consentCase={consentCase}
                     policy={policy}
-                    receipt={getReceiptByCaseId(consentCase.id)}
+                    receipt={receiptByCaseId.get(consentCase.id)}
                   />
                 );
               })

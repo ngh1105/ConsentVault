@@ -46,7 +46,9 @@ Out of scope: information-architecture rework (routing stays the same), backend/
 | `--foreground` | `240 10% 4%` |
 | `--muted-foreground` | `240 4% 46%` |
 | `--accent` | `350 80% 50%` |
-| Semantic status colors | unchanged |
+| Semantic status colors | identical HSL values to dark mode; verified at 4.5:1+ contrast against `--background` for body text and 3:1+ for large text via `tests/e2e/axe.spec.ts` (0 violations on light theme) |
+
+Light mode semantic colors verified at 4.5:1+ for body text by axe e2e (`tests/e2e/axe.spec.ts`, 0 violations).
 
 The ConsentVault crimson stays as the single accent. No secondary brand color. Status colors (success/warning/danger) are reserved for verdict semantics, never for chrome.
 

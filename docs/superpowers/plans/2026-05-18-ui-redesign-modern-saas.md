@@ -310,7 +310,7 @@ Call `get_artifact` once per screen entry. Save the JSON response to local files
 
 Append to `.gitignore`:
 
-```
+```gitignore
 # OpenDesign export — intermediate, do not commit
 docs/superpowers/artifacts/
 ```

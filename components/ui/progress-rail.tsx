@@ -17,7 +17,11 @@ export function ProgressRail({ steps }: { steps: ProgressStep[] }) {
     >
       <ol className="mx-auto flex h-full max-w-[1280px] items-center gap-6 overflow-x-auto px-6 md:px-10">
         {steps.map((step) => (
-          <li key={step.id} className="flex flex-shrink-0 items-center gap-2">
+          <li
+            key={step.id}
+            className="flex flex-shrink-0 items-center gap-2"
+            aria-current={step.state === "current" ? "step" : undefined}
+          >
             {step.state === "locked" ? (
               <span aria-disabled="true" className="flex items-center gap-2 text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-muted-foreground/40" />
@@ -26,6 +30,7 @@ export function ProgressRail({ steps }: { steps: ProgressStep[] }) {
             ) : (
               <Link
                 href={step.href}
+                aria-current={step.state === "current" ? "step" : undefined}
                 className={`flex items-center gap-2 transition-colors ${
                   step.state === "current" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
