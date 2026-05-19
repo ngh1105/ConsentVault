@@ -133,14 +133,14 @@ export function IntakeForm({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center justify-center rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+            className="inline-flex items-center justify-center rounded-full border border-border bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/10"
           >
             Reset intake
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground shadow-sm transition hover:translate-y-[-1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center justify-center rounded-full bg-[hsl(350_80%_44%)] px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-white shadow-sm transition hover:translate-y-[-1px] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSubmitting ? "Opening case" : "Open draft case"}
           </button>

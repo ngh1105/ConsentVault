@@ -3,117 +3,52 @@
 @tailwind utilities;
 
 :root {
-  --background: 42 35% 96%;
-  --foreground: 225 30% 11%;
-  --card: 42 30% 98%;
-  --card-foreground: 225 30% 11%;
-  --muted: 42 12% 90%;
-  --muted-foreground: 225 10% 38%;
-  --accent: 356 70% 43%;
+  --background: 240 6% 6%;
+  --card: 240 5% 10%;
+  --card-elevated: 240 5% 13%;
+  --border: 240 4% 16%;
+  --border-strong: 240 4% 24%;
+  --foreground: 0 0% 98%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 350 80% 55%;
   --accent-foreground: 0 0% 100%;
-  --border: 38 18% 78%;
-  --ring: 356 70% 43%;
-  --ink: 225 30% 11%;
-  --parchment-shadow: 34 23% 68%;
+  --success: 142 70% 45%;
+  --warning: 38 92% 50%;
+  --danger: 0 84% 60%;
+  --ring: 350 80% 55%;
+}
+
+.light {
+  --background: 0 0% 100%;
+  --card: 240 5% 98%;
+  --card-elevated: 0 0% 100%;
+  --border: 240 6% 90%;
+  --border-strong: 240 5% 80%;
+  --foreground: 240 10% 4%;
+  --muted-foreground: 240 4% 46%;
+  --accent: 350 80% 50%;
+  --ring: 350 80% 50%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-
   html {
     scroll-behavior: smooth;
   }
-
   body {
-    @apply bg-background font-serif text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.9), transparent 34%),
-      linear-gradient(180deg, rgba(128, 33, 40, 0.06), rgba(128, 33, 40, 0) 28%),
-      linear-gradient(135deg, rgba(118, 87, 41, 0.08), rgba(255, 255, 255, 0) 45%);
+    @apply bg-background font-sans text-foreground antialiased;
   }
-
-  body::selection {
-    background: hsl(var(--accent) / 0.2);
-  }
-
-  a {
-    @apply transition-colors;
-  }
-
   :focus-visible {
-    outline: 2px solid hsl(var(--ring));
+    outline: 2px solid hsl(var(--accent));
     outline-offset: 3px;
-    box-shadow: 0 0 0 6px hsl(var(--accent) / 0.16);
-  }
-}
-
-@layer components {
-  .grain-overlay {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)),
-      radial-gradient(circle at 1px 1px, rgba(59, 33, 12, 0.07) 1px, transparent 0);
-    background-size: auto, 12px 12px;
-    mix-blend-mode: multiply;
-    opacity: 0.45;
-  }
-
-  .eyebrow {
-    @apply font-mono text-[0.7rem] uppercase tracking-[0.28em];
-  }
-
-  .metadata-label {
-    @apply inline-flex items-center rounded-full border border-accent/15 bg-accent/8 px-3 py-1 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-accent;
-  }
-
-  .evidence-card {
-    @apply rounded-[2rem] border border-[hsl(var(--border))] bg-card/90 text-card-foreground shadow-dossier backdrop-blur-sm;
-    background-image:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(250, 245, 236, 0.92)),
-      linear-gradient(90deg, rgba(128, 33, 40, 0.06), rgba(128, 33, 40, 0));
-  }
-
-  .verdict-banner {
-    @apply rounded-[2rem] border border-accent/30 shadow-dossier;
-    background:
-      linear-gradient(135deg, hsl(var(--accent)) 0%, rgba(106, 15, 30, 0.95) 100%);
-  }
-
-  .ledger-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.35), transparent);
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.16);
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-
-  .bg-accent\/6 {
-    background-color: hsl(var(--accent) / 0.06);
-  }
-
-  .bg-accent\/8 {
-    background-color: hsl(var(--accent) / 0.08);
-  }
-
-  .border-ink\/10 {
-    border-color: hsl(var(--ink) / 0.1);
-  }
-
-  .archive-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  @media (min-width: 1280px) {
-    .archive-grid {
-      grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
-    }
-  }
-
-  .archive-overflow-wrap {
-    overflow-wrap: anywhere;
   }
 }

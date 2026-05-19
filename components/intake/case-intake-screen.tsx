@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Landmark, NotebookText, Scale } from "lucide-react";
 import {
   buildEvidenceBundlePreview,
   buildPreparedIntakeCaseSubmission,
 } from "@/lib/case-intake";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
+import { EmptyState } from "@/components/ui/empty-state";
 import { EvidenceBundlePreview } from "./evidence-bundle-preview";
-import { IntakeForm, type IntakeFormValues } from "./intake-form";
+import type { IntakeFormValues } from "./intake-form";
 
 function createEmptyIntakeForm(policyId: string): IntakeFormValues {
   return {
@@ -20,6 +20,15 @@ function createEmptyIntakeForm(policyId: string): IntakeFormValues {
     platformUrl: "",
     notes: "",
   };
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{title}</h2>
+      <div className="mt-4 flex flex-col gap-4">{children}</div>
+    </section>
+  );
 }
 
 export function CaseIntakeScreen() {
@@ -48,13 +57,10 @@ export function CaseIntakeScreen() {
 
   if (!selectedPolicy) {
     return (
-      <section className="evidence-card p-6 sm:p-8">
-        <p className="metadata-label">Policy unavailable</p>
-        <h1 className="mt-5 font-display text-4xl font-semibold">No creator policy is available for intake.</h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-          Add or restore a consent policy before opening a new dispute file.
-        </p>
-      </section>
+      <EmptyState
+        headline="No creator policy is available for intake"
+        description="Add or restore a consent policy before opening a new dispute file."
+      />
     );
   }
 
@@ -66,7 +72,9 @@ export function CaseIntakeScreen() {
     setValues(createEmptyIntakeForm(selectedPolicy.id));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (isSubmitting) {
       return;
     }
@@ -83,7 +91,7 @@ export function CaseIntakeScreen() {
         payload: preparedSubmission,
       });
 
-      await router.push(`/cases/${caseId}`);
+      router.push(`/cases/${caseId}`);
     } catch (error) {
       setIsSubmitting(false);
       throw error;
@@ -91,92 +99,135 @@ export function CaseIntakeScreen() {
   };
 
   return (
-    <div className="space-y-6">
-      <section className="archive-grid grid gap-6">
-        <article className="evidence-card min-w-0 p-6 sm:p-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="metadata-label">Dispute intake</span>
-            <span className="rounded-full border border-ink/10 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
-              archive filing desk
-            </span>
+    <div className="mx-auto max-w-3xl px-6 py-16 md:px-10">
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground">New case</h1>
+      <form onSubmit={handleSubmit} noValidate={false}>
+        <div className="mt-8 flex flex-col gap-12">
+          <Section title="Case info">
+            <label className="block space-y-2" htmlFor="intake-policy">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Creator policy
+              </span>
+              <select
+                id="intake-policy"
+                value={values.policyId}
+                onChange={(event) => handleFieldChange("policyId", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                required
+              >
+                {policies.map((policy) => (
+                  <option key={policy.id} value={policy.id}>
+                    {policy.creatorName} ({policy.creatorHandle})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block space-y-2" htmlFor="intake-title">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Suspicious content title
+              </span>
+              <input
+                id="intake-title"
+                value={values.title}
+                onChange={(event) => handleFieldChange("title", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="Voice clone dispute"
+                required
+              />
+            </label>
+          </Section>
+
+          <Section title="Original content">
+            <label className="block space-y-2" htmlFor="intake-source-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Original source URL
+              </span>
+              <input
+                id="intake-source-url"
+                type="url"
+                value={values.sourceUrl}
+                onChange={(event) => handleFieldChange("sourceUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://creator.example/source"
+                required
+              />
+            </label>
+          </Section>
+
+          <Section title="AI output">
+            <label className="block space-y-2" htmlFor="intake-ai-output-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                AI output URL
+              </span>
+              <input
+                id="intake-ai-output-url"
+                type="url"
+                value={values.aiOutputUrl}
+                onChange={(event) => handleFieldChange("aiOutputUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://platform.example/output"
+                required
+              />
+            </label>
+          </Section>
+
+          <Section title="Source links">
+            <label className="block space-y-2" htmlFor="intake-platform-url">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Platform URL
+              </span>
+              <input
+                id="intake-platform-url"
+                type="url"
+                value={values.platformUrl}
+                onChange={(event) => handleFieldChange("platformUrl", event.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground"
+                placeholder="https://platform.example/post"
+                required
+              />
+            </label>
+          </Section>
+
+          <Section title="Notes">
+            <label className="block space-y-2" htmlFor="intake-notes">
+              <span className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                Intake notes
+              </span>
+              <textarea
+                id="intake-notes"
+                value={values.notes}
+                onChange={(event) => handleFieldChange("notes", event.target.value)}
+                className="min-h-32 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm leading-6 text-foreground"
+                placeholder="Why does this look suspicious, deceptive, or out of policy?"
+              />
+            </label>
+          </Section>
+        </div>
+
+        <div className="sticky bottom-0 mt-12 -mx-6 border-t border-border bg-background/90 px-6 py-4 backdrop-blur-md md:-mx-10 md:px-10">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleReset}
+              aria-label="Clear form fields"
+              className="inline-flex h-10 items-center rounded-full border border-border bg-card px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:bg-card-elevated"
+            >
+              Reset
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex h-10 items-center rounded-full bg-[hsl(350_80%_44%)] px-5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? "Opening case" : "Open draft case"}
+            </button>
           </div>
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-tight text-balance sm:text-5xl">
-            File a new dispute, attach the linked policy, and verify the evidence bundle before it lands in the archive.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-            Each intake starts as a draft case with exactly three evidence records: the source, the AI output, and the platform listing that carries the disputed material.
-          </p>
+        </div>
+      </form>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-[1.4rem] border border-border/80 bg-background/70 p-5">
-              <div className="flex items-center gap-2 text-accent">
-                <Landmark className="h-4 w-4" aria-hidden="true" />
-                <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Selected policy</span>
-              </div>
-              <p className="mt-3 font-display text-2xl">{selectedPolicy.creatorName}</p>
-              <p className="archive-overflow-wrap text-sm text-muted-foreground">{selectedPolicy.creatorHandle}</p>
-            </div>
-            <div className="rounded-[1.4rem] border border-border/80 bg-background/70 p-5">
-              <div className="flex items-center gap-2 text-accent">
-                <NotebookText className="h-4 w-4" aria-hidden="true" />
-                <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Blocked uses</span>
-              </div>
-              <p className="mt-3 font-display text-3xl">{selectedPolicy.blockedUses.length}</p>
-              <p className="text-sm text-muted-foreground">Restrictions carried into the new case file.</p>
-            </div>
-            <div className="rounded-[1.4rem] border border-border/80 bg-background/70 p-5">
-              <div className="flex items-center gap-2 text-accent">
-                <Scale className="h-4 w-4" aria-hidden="true" />
-                <span className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Preview cards</span>
-              </div>
-              <p className="mt-3 font-display text-3xl">{previewItems.length}</p>
-              <p className="text-sm text-muted-foreground">Exactly three records are staged before submission.</p>
-            </div>
-          </div>
-        </article>
-
-        <aside className="min-w-0 space-y-4">
-          <section className="verdict-banner p-6 text-accent-foreground">
-            <p className="font-mono text-[0.68rem] uppercase tracking-[0.28em] text-accent-foreground/80">
-              Policy citation
-            </p>
-            <h2 className="mt-3 archive-overflow-wrap font-display text-3xl font-semibold">{selectedPolicy.id}</h2>
-            <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
-              Intake attaches this creator record so the case overview opens with the right consent context.
-            </p>
-          </section>
-
-          <section className="evidence-card p-6">
-            <p className="metadata-label">Active restrictions</p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-foreground">
-              {selectedPolicy.blockedUses.map((item) => (
-                <li key={item} className="rounded-[1.2rem] border border-border/80 bg-background/70 px-4 py-3">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-        </aside>
-      </section>
-
-      <section className="archive-grid grid gap-6">
-        <article className="evidence-card min-w-0 p-6">
-          <p className="metadata-label">Submission form</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold">New dispute dossier</h2>
-          <div className="mt-6">
-            <IntakeForm
-              policies={policies}
-              values={values}
-              isSubmitting={isSubmitting}
-              onFieldChange={handleFieldChange}
-              onReset={handleReset}
-              onSubmit={handleSubmit}
-            />
-          </div>
-        </article>
-
+      <div className="mt-8">
         <EvidenceBundlePreview items={previewItems} />
-      </section>
+      </div>
     </div>
   );
 }

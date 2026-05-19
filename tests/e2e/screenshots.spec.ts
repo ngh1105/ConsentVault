@@ -5,8 +5,8 @@ const screenshotsDir = path.resolve(__dirname, "..", "..", "docs", "screenshots"
 
 const captures = [
   { file: "01-dashboard.png", path: "/", waitFor: "Review creator policies" },
-  { file: "02-policy.png", path: "/policy", waitFor: "Shape the consent policy" },
-  { file: "03-new-case.png", path: "/cases/new", waitFor: "File a new dispute" },
+  { file: "02-policy.png", path: "/policy", waitFor: "Creator policy" },
+  { file: "03-new-case.png", path: "/cases/new", waitFor: "New case" },
   {
     file: "04-case-overview.png",
     path: "/cases/case-voice-clone",
@@ -25,7 +25,7 @@ const captures = [
   {
     file: "07-receipt.png",
     path: "/cases/case-voice-clone/receipt",
-    waitFor: "Voice clone dispute",
+    waitFor: "Violation",
   },
 ] as const;
 

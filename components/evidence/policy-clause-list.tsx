@@ -14,9 +14,9 @@ type PolicyClauseListProps = {
 export function PolicyClauseList({ policy, matchedClauses, consentCase }: PolicyClauseListProps) {
   if (!policy) {
     return (
-      <section className="evidence-card p-6">
-        <p className="metadata-label">Policy unavailable</p>
-        <h2 className="mt-4 font-display text-3xl font-semibold">No creator policy was linked to this evidence file.</h2>
+      <section className="rounded-2xl border border-border bg-card p-6">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Policy unavailable</p>
+        <h2 className="mt-4 text-3xl font-semibold">No creator policy was linked to this evidence file.</h2>
         <p className="mt-4 text-sm leading-6 text-muted-foreground">
           The workspace can still display the dispute record, but clause matching is unavailable until the case is linked to a policy.
         </p>
@@ -25,11 +25,11 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
   }
 
   return (
-    <section className="evidence-card p-6 sm:p-7">
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="metadata-label">Clause review</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold">Blocked-use ledger</h2>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Clause review</p>
+          <h2 className="mt-4 text-3xl font-semibold">Blocked-use ledger</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
             {consentCase.title} is checked against every blocked clause in {policy.creatorName}&apos;s archived policy.
           </p>
@@ -38,17 +38,17 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <article className="rounded-[1.6rem] border border-accent/20 bg-accent/6 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <Link2 className="h-4 w-4" aria-hidden="true" />
-            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Matched clauses</p>
+        <article className="rounded-[1.6rem] border border-accent/20 bg-accent/10 p-5">
+          <div className="flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-accent" aria-hidden="true" />
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-foreground">Matched clauses</p>
           </div>
           {matchedClauses.length > 0 ? (
             <ul className="mt-4 space-y-3" aria-label="Matched blocked clauses">
               {matchedClauses.map((clause) => (
                 <li
                   key={clause}
-                  className="rounded-[1.2rem] border border-accent/20 bg-card/75 px-4 py-3 text-sm leading-6 text-foreground"
+                  className="rounded-[1.2rem] border border-accent/20 bg-card px-4 py-3 text-sm leading-6 text-foreground"
                 >
                   {clause}
                 </li>
@@ -61,10 +61,10 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
           )}
         </article>
 
-        <article className="rounded-[1.6rem] border border-border/80 bg-background/70 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <ScrollText className="h-4 w-4" aria-hidden="true" />
-            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em]">Full blocked-use list</p>
+        <article className="rounded-[1.6rem] border border-border/80 bg-background p-5">
+          <div className="flex items-center gap-2">
+            <ScrollText className="h-4 w-4 text-accent" aria-hidden="true" />
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-foreground">Full blocked-use list</p>
           </div>
           <ul className="mt-4 space-y-3" aria-label="All blocked policy clauses">
             {policy.blockedUses.map((clause) => {
@@ -76,14 +76,14 @@ export function PolicyClauseList({ policy, matchedClauses, consentCase }: Policy
                   className={cn(
                     "rounded-[1.2rem] border px-4 py-3 text-sm leading-6 transition-colors",
                     isMatch
-                      ? "border-accent/25 bg-accent/8 text-foreground shadow-sm"
-                      : "border-border/70 bg-card/75 text-muted-foreground",
+                      ? "border-accent/25 bg-accent/10 text-foreground shadow-sm"
+                      : "border-border/70 bg-card text-muted-foreground",
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span>{clause}</span>
                     {isMatch ? (
-                      <span className="rounded-full border border-accent/20 bg-accent/10 px-2 py-1 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-accent">
+                      <span className="rounded-full border border-accent/30 bg-accent/5 px-2 py-1 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-foreground">
                         Match
                       </span>
                     ) : null}

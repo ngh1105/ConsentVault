@@ -20,14 +20,14 @@ export function StatePanel({
 }: StatePanelProps) {
   return (
     <section
-      className="evidence-card mx-auto flex w-full max-w-3xl flex-col gap-5 px-5 py-8 sm:px-8 sm:py-10"
+      className="rounded-2xl border border-border bg-card p-5 mx-auto flex w-full max-w-3xl flex-col gap-5 px-5 py-8 sm:px-8 sm:py-10"
       aria-live={loading ? "polite" : undefined}
       aria-busy={loading || undefined}
     >
       <div className="flex flex-wrap items-center gap-3">
-        <p className="metadata-label">{label}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
         {loading ? (
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent/15 bg-accent/8 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
             <LoaderCircle className="h-3.5 w-3.5 animate-spin text-accent" aria-hidden="true" />
             Loading archive
           </span>

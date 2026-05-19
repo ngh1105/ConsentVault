@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, FileX2, Sparkles } from "lucide-react";
 import { useConsentVault } from "@/components/providers/consent-vault-provider";
-import { ReceiptCard } from "@/components/receipt/receipt-card";
-import { ShareActions } from "@/components/receipt/share-actions";
+import { VerdictBanner } from "@/components/ui/verdict-banner";
 
 type ReceiptScreenProps = {
   caseId: string;
@@ -12,13 +11,13 @@ type ReceiptScreenProps = {
 
 function MissingState({ title, description }: { title: string; description: string }) {
   return (
-    <section className="evidence-card p-6 sm:p-8">
-      <p className="metadata-label">Receipt unavailable</p>
-      <h1 className="mt-5 font-display text-4xl font-semibold">{title}</h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">{description}</p>
+    <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Receipt unavailable</p>
+      <h1 className="mt-3 text-2xl font-semibold text-foreground">{title}</h1>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>
       <Link
         href="/"
-        className="mt-6 inline-flex rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground"
+        className="mt-4 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90"
       >
         Back to dashboard
       </Link>
@@ -55,68 +54,60 @@ export function ReceiptScreen({ caseId }: ReceiptScreenProps) {
   if (!receipt) {
     return (
       <div className="space-y-6">
-        <section className="evidence-card p-6 sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="metadata-label">Receipt pending</p>
-              <h1 className="mt-5 font-display text-4xl font-semibold text-balance sm:text-5xl">
-                Generate a verdict receipt for {consentCase.title}
-              </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
-                This case has archive context and policy linkage, but it still needs a trial run before a shareable receipt can be produced.
-              </p>
-            </div>
-            <div className="rounded-[1.5rem] border border-border/80 bg-background/70 px-5 py-4 text-right">
-              <p className="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
-                Current status
-              </p>
-              <p className="mt-3 font-display text-3xl">{consentCase.status}</p>
-            </div>
-          </div>
+        <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            Receipt pending
+          </p>
+          <h1 className="mt-3 text-2xl font-semibold text-foreground sm:text-3xl">
+            Generate a verdict receipt for {consentCase.title}
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+            This case has archive context and policy linkage, but it still needs a trial run before a shareable receipt can be produced.
+          </p>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-2">
-            <section className="rounded-[1.7rem] border border-border/80 bg-background/70 p-5">
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-border bg-card-elevated p-5">
               <div className="flex items-center gap-3">
-                <FileX2 className="h-5 w-5 text-accent" aria-hidden="true" />
-                <h2 className="font-display text-3xl font-semibold">No receipt on file</h2>
+                <FileX2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <h2 className="text-lg font-semibold text-foreground">No receipt on file</h2>
               </div>
-              <p className="mt-4 text-sm leading-7 text-foreground">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Open the mock trial route to generate deterministic validator judgments and save the final verdict into the archive.
               </p>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   href={`/cases/${consentCase.id}/trial`}
-                  className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground transition hover:translate-y-[-1px] hover:shadow-md"
+                  className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90"
                 >
                   Run mock trial
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <Link
                   href={`/cases/${consentCase.id}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-elevated"
                 >
                   Return to case
                   <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </div>
-            </section>
+            </div>
 
-            <section className="verdict-banner p-6 text-accent-foreground">
-              <p className="font-mono text-[0.68rem] uppercase tracking-[0.28em] text-accent-foreground/80">
+            <div className="rounded-xl border border-border bg-card-elevated p-5">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
                 Receipt workflow
               </p>
-              <p className="mt-4 font-display text-3xl font-semibold">Trial first, receipt second.</p>
-              <p className="mt-3 text-sm leading-6 text-accent-foreground/85">
+              <p className="mt-3 text-lg font-semibold text-foreground">Trial first, receipt second.</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Once the simulated validators agree on a verdict, this route becomes the final archive card and export surface.
               </p>
               <Link
                 href={`/cases/${consentCase.id}/trial`}
-                className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground transition hover:bg-white/8"
+                className="mt-4 inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-elevated"
               >
                 Open trial page
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-            </section>
+            </div>
           </div>
         </section>
       </div>
@@ -128,22 +119,101 @@ export function ReceiptScreen({ caseId }: ReceiptScreenProps) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/cases/${consentCase.id}`}
-          className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-elevated"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to case overview
         </Link>
         <Link
           href={`/cases/${consentCase.id}/trial`}
-          className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-card/70 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.22em] text-foreground transition hover:border-accent/20 hover:bg-accent/8"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-elevated"
         >
           Revisit trial
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
 
-      <ReceiptCard consentCase={consentCase} policy={policy} receipt={receipt} />
-      <ShareActions receipt={receipt} />
+      <VerdictBanner
+        verdict={receipt.finalVerdict}
+        score={receipt.score}
+        caseTitle={consentCase.title}
+      />
+
+      <section className="rounded-2xl border border-border bg-card p-6">
+        <h2 className="text-lg font-semibold text-foreground">Receipt metadata</h2>
+        <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Receipt ID
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.id}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Case ID
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.caseId}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Final verdict
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.finalVerdict}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Consensus score
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.score} / 100</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Judgments
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.judgments.length} validators</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Issued at
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.createdAt}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Policy
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{policy.creatorName} ({policy.creatorHandle})</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Recommended action
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">{receipt.recommendedAction}</dd>
+          </div>
+          {receipt.wallet && (
+            <div>
+              <dt className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                GenLayer issuer
+              </dt>
+              <dd className="mt-1 text-sm text-foreground break-all">{receipt.wallet.issuerAddress}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-6">
+        <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Summary</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{receipt.summary}</p>
+      </section>
+
+      <details className="rounded-2xl border border-border bg-card">
+        <summary className="cursor-pointer px-6 py-4 text-sm font-medium text-foreground hover:bg-card-elevated transition rounded-2xl">
+          Export receipt as JSON
+        </summary>
+        <pre className="overflow-x-auto border-t border-border px-6 py-4 font-mono text-xs text-foreground">
+          {JSON.stringify(receipt, null, 2)}
+        </pre>
+      </details>
     </div>
   );
 }
