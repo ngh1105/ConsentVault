@@ -13,6 +13,43 @@ invocations and JSON payloads needed for each case but never sends a
 transaction. Run the printed commands yourself so the signer prompt and
 receipt land in your own terminal.
 
+## Lint and validate the contract
+
+Before re-seeding (or before re-deploying after any change to
+`contracts/consent_vault_trial/main.py`), run the GenVM linter against
+the contract source:
+
+```powershell
+# Windows PowerShell
+$env:PYTHONIOENCODING = 'utf-8'
+C:\Users\Admin\AppData\Local\Programs\Python\Python312\Scripts\genvm-lint.exe check contracts\consent_vault_trial\main.py
+```
+
+```bash
+# bash / WSL — use the genvm-lint on PATH
+PYTHONIOENCODING=utf-8 genvm-lint check contracts/consent_vault_trial/main.py
+```
+
+Note: the executable is `genvm-lint`, not `genvm-linter`. It ships with
+the GenVM Python distribution.
+
+Expected result on a clean checkout:
+
+```
+✓ Lint passed (3 checks)
+✓ Validation passed
+  Contract: ConsentVaultTrial
+  Methods:
+    - get_result_by_case (view)
+    - run_trial (write)
+```
+
+The `Validation` step fetches the pinned `py-genlayer` SDK (see the
+`# { "Depends": "py-genlayer:..." }` header in `main.py`). If that fetch
+fails with `HTTP Error 404: Not Found`, retry once — the SDK store can
+be transiently unreachable. Lint-only output (the first check) is still
+authoritative for source-level issues.
+
 ## Preconditions
 
 Before the printed commands will work end-to-end:
