@@ -104,6 +104,38 @@ For each seed in the plan output:
 4. Copy the corresponding `genlayer call` block and run it to confirm
    the persisted JSON contains the expected `finalVerdict`.
 
+Note: the current `genlayer-cli` argument parser attempts to coerce valid
+JSON objects into dictionaries. The deployed `run_trial` method expects
+two JSON-encoded strings (`case_json`, `policy_json`), so if the CLI
+receipt shows `JSONDecodeError` or `run_trial() takes 3 positional
+arguments but ... were given`, do not keep retrying the CLI form. Use the
+same `genlayer-js` write path as the app (`args: [caseJson, policyJson]`)
+so the contract receives strings.
+
+## Seed record
+
+The Studionet contract at
+`0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` was seeded on 2026-05-20
+with signer `shieldtest`
+(`0xD12e272d9b464B5287c50307321c1bB1f6092517`) through the
+`genlayer-js` write path.
+
+| Case id | Tx hash | Status | Result | Rounds | Verdict | Score |
+| --- | --- | --- | --- | --- | --- | --- |
+| `seed-case-voice-clone` | `0x4c5f88b57e583f06aefcadf38836c2a023131c2a86197913090519eff12ac3fb` | `FINALIZED` | `MAJORITY_AGREE` | 1 | `Violation` | 92 |
+| `seed-case-dataset-consent` | `0xab8c0831ae6995ff5eeed51ca793fb32485a32728f7a4661d4f2f85d8289a0fb` | `FINALIZED` | `MAJORITY_AGREE` | 2 | `Violation` | 95 |
+
+Read verification:
+
+- `get_result_by_case("seed-case-voice-clone")` returned a 1,839 byte
+  JSON result. Summary: `2 validators concluded the reuse conflicts
+  directly with Mara Ellison's policy and the 3 cited records support
+  enforcement-ready escalation.`
+- `get_result_by_case("seed-case-dataset-consent")` returned a 1,893 byte
+  JSON result. Summary: `2 validators concluded the reuse conflicts
+  directly with Lior Hagen's policy and the 4 cited records support
+  enforcement-ready escalation.`
+
 ## Smoke the read path from the frontend
 
 After both seeds finalize:
