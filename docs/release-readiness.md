@@ -40,11 +40,14 @@ b4d4185 chore(tests): fix typecheck regressions
 
 ## 4. Human-only checklist
 
-These cannot be exercised from CI/CLI without a funded Studionet account,
-MetaMask interaction, or Vercel project owner login. Production
-(`https://consentvault.vercel.app`) is now serving the latest commit
-(deploy id `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A`, created
-2026-05-20 19:30 ICT) — start from the wallet flow.
+These cannot be exercised from a regular CI run because they need a
+human at MetaMask plus Vercel project owner access. Production
+(`https://consentvault.vercel.app`) is serving deploy
+`dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A` (created 2026-05-20 19:30 ICT) and
+the deployed contract `0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` has
+already been smoke-seeded with two finalized `run_trial` executions via
+the funded `shieldtest` Studionet account — see
+`docs/contract-seeding.md` for tx hashes. Start from the wallet flow.
 
 - [ ] **Vercel Git auto-deploy connected** — the CLI deploy worked, but
       the previous push did not auto-trigger a build. Confirm Project
@@ -100,9 +103,13 @@ MetaMask interaction, or Vercel project owner login. Production
 **READY FOR HUMAN METAMASK QA.**
 
 All automated checks pass on the current head. Production
-(`https://consentvault.vercel.app`) is now serving deploy
+(`https://consentvault.vercel.app`) is serving deploy
 `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A` (created via CLI deploy at
 2026-05-20 19:30 ICT) and homepage HTML carries the redesigned copy
-(`Review creator policies`, `Create case`, `Read the policy`).
+(`Review creator policies`, `Create case`, `Read the policy`). The
+deployed contract `0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` has
+been smoke-seeded with two FINALIZED `run_trial` cases
+(`seed-case-voice-clone`, `seed-case-dataset-consent`) — see
+`docs/contract-seeding.md` for tx hashes and verification.
 Outstanding work is wallet/dashboard-bound; walk
 `docs/manual-qa-checklist.md` against the live URL.
