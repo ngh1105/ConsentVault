@@ -4,13 +4,14 @@ Generated 2026-05-20 from a full local audit on Windows 11 + Node 22.
 
 ## 1. Current head
 
-- Commit: `29b96c3` docs: refresh demo screenshots
+- Commit: `be7a80c` docs: add release readiness report
 - Branch: `master`
 - Working tree: clean
 
 Recent commits on this branch:
 
 ```
+be7a80c docs: add release readiness report
 29b96c3 docs: refresh demo screenshots
 64b2605 docs: align receipt JSON copy with Export disclosure UI
 bd51001 chore(e2e): align consentvault-flow with redesigned UI
@@ -21,8 +22,9 @@ b4d4185 chore(tests): fix typecheck regressions
 
 ## 2. Repo sync status
 
-- Local `master` is **ahead of `origin/master` by 1 commit** (`29b96c3`).
-- Push is required before kicking off the next Vercel deploy.
+- Local `master` is **in sync with `origin/master`** (push completed
+  2026-05-20 ~11:26 UTC).
+- Next signal comes from Vercel; see §5 for the auto-deploy concern.
 
 ## 3. Automated verification
 
@@ -39,11 +41,15 @@ b4d4185 chore(tests): fix typecheck regressions
 ## 4. Human-only checklist
 
 These cannot be exercised from CI/CLI without a funded Studionet account,
-MetaMask interaction, or Vercel project owner login. Run them after pushing
-`29b96c3` to origin.
+MetaMask interaction, or Vercel project owner login. The push to
+`origin/master` is already complete — start with the Vercel deploy
+verification.
 
-- [ ] **Vercel Git auto-deploy connected** — pushing to `master` triggers a
-      production deploy on Vercel.
+- [ ] **Vercel Git auto-deploy connected** — `npx vercel ls --prod` after
+      the latest push showed the most recent production deploy was 19h
+      old, not the new commit. Either trigger a manual redeploy in the
+      Vercel dashboard or confirm the Git integration is enabled on the
+      project.
 - [ ] **Production env vars set** in Vercel project settings:
   - `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`
   - `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x…`
@@ -62,7 +68,7 @@ MetaMask interaction, or Vercel project owner login. Run them after pushing
       https://www.opengraph.xyz/. The 1200×630 archive-style PNG renders
       with `Studionet · Chain id 61999` in the footer.
 
-## 5. Known non-blockers
+## 5. Known non-blockers and observed concerns
 
 - **No GitHub Actions workflows configured** — `gh run list --limit 5`
   returns empty. CI signal is local verification only.
@@ -74,14 +80,23 @@ MetaMask interaction, or Vercel project owner login. Run them after pushing
   the wallet guard, so screenshot regeneration must inject
   `NEXT_PUBLIC_TRIAL_ENGINE=mock` for the run. This is a property of the
   capture script, not a runtime bug.
+- **Vercel auto-deploy lag (observed concern)** — at audit time, the most
+  recent production deployment on `consentvault.vercel.app` was 19 hours
+  old despite a fresh push to `origin/master`. Cause not confirmed without
+  dashboard access. Possible reasons: Git integration not enabled on the
+  project, deploy queued but not started, or a different branch set as the
+  production source. Verify via Project Settings → Git in the Vercel
+  dashboard.
 - **Studionet ephemerality** — Studio resets wipe contract state. If the
   public deploy starts showing empty receipts, redeploy the contract per
   `docs/deploy-contract.md` and update `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS`.
 
 ## 6. Final verdict
 
-**READY FOR HUMAN QA.**
+**READY FOR HUMAN QA** for code/docs surface, **PARTIAL** for end-to-end
+deploy until the Vercel auto-deploy lag is resolved.
 
 All automated checks pass on the current head. Outstanding work is
-inherently wallet/dashboard-bound and cannot be exercised from CLI. Push
-`29b96c3` to `origin/master`, then walk the human checklist above.
+inherently wallet/dashboard-bound. First human action: confirm the latest
+push produced a new Vercel production deploy, then walk
+`docs/manual-qa-checklist.md`.
