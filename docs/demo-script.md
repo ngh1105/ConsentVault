@@ -91,8 +91,8 @@ regenerate them).
 > score, validator summary, cited evidence, recommended next action, and —
 > when the wallet is connected — the GenLayer issuer address + network."
 
-- Use **Copy receipt JSON** to show the export flow (the same JSON that
-  external systems can ingest).
+- Expand **Export receipt as JSON** to show the export flow (the same JSON
+  that external systems can ingest).
 
 📷 Screenshot: `07-receipt.png`
 

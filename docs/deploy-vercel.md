@@ -54,8 +54,9 @@ Open the URL in a private window with MetaMask installed:
       for finalization.
 - [ ] Receipt route shows the verdict + GenLayer issuer + transaction
       result.
-- [ ] **Copy receipt JSON** — paste somewhere; confirm the JSON includes
-      the `wallet` block.
+- [ ] **Export receipt as JSON** — expand the disclosure on the receipt
+      route, copy the JSON payload, paste it somewhere; confirm it
+      includes the `wallet` block.
 - [ ] On the dashboard, **OG image preview** in social sharing tools shows
       the archive-style 1200x630 image (paste the URL into LinkedIn or
       X composer, or use https://www.opengraph.xyz/).
