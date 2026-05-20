@@ -41,15 +41,15 @@ b4d4185 chore(tests): fix typecheck regressions
 ## 4. Human-only checklist
 
 These cannot be exercised from CI/CLI without a funded Studionet account,
-MetaMask interaction, or Vercel project owner login. The push to
-`origin/master` is already complete — start with the Vercel deploy
-verification.
+MetaMask interaction, or Vercel project owner login. Production
+(`https://consentvault.vercel.app`) is now serving the latest commit
+(deploy id `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A`, created
+2026-05-20 19:30 ICT) — start from the wallet flow.
 
-- [ ] **Vercel Git auto-deploy connected** — `npx vercel ls --prod` after
-      the latest push showed the most recent production deploy was 19h
-      old, not the new commit. Either trigger a manual redeploy in the
-      Vercel dashboard or confirm the Git integration is enabled on the
-      project.
+- [ ] **Vercel Git auto-deploy connected** — the CLI deploy worked, but
+      the previous push did not auto-trigger a build. Confirm Project
+      Settings → Git is wired so future `master` pushes deploy without
+      manual intervention.
 - [ ] **Production env vars set** in Vercel project settings:
   - `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`
   - `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x…`
@@ -80,23 +80,29 @@ verification.
   the wallet guard, so screenshot regeneration must inject
   `NEXT_PUBLIC_TRIAL_ENGINE=mock` for the run. This is a property of the
   capture script, not a runtime bug.
-- **Vercel auto-deploy lag (observed concern)** — at audit time, the most
-  recent production deployment on `consentvault.vercel.app` was 19 hours
-  old despite a fresh push to `origin/master`. Cause not confirmed without
-  dashboard access. Possible reasons: Git integration not enabled on the
-  project, deploy queued but not started, or a different branch set as the
-  production source. Verify via Project Settings → Git in the Vercel
-  dashboard.
+- **Vercel auto-deploy lag (observed concern, partially resolved)** — at
+  audit time, the most recent production deployment on
+  `consentvault.vercel.app` was 19 hours old despite a fresh push to
+  `origin/master`. Pushing the next commit (`26c22a0`) also did not
+  trigger a build within the observation window. The fresh production
+  surface was restored by an explicit CLI deploy
+  (`npx vercel --prod`, deploy id `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A`,
+  alias `https://consentvault.vercel.app`). The underlying Git-integration
+  question is still unverified — confirm via Project Settings → Git in
+  the Vercel dashboard before relying on push-to-deploy for further
+  iterations.
 - **Studionet ephemerality** — Studio resets wipe contract state. If the
   public deploy starts showing empty receipts, redeploy the contract per
   `docs/deploy-contract.md` and update `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS`.
 
 ## 6. Final verdict
 
-**READY FOR HUMAN QA** for code/docs surface, **PARTIAL** for end-to-end
-deploy until the Vercel auto-deploy lag is resolved.
+**READY FOR HUMAN METAMASK QA.**
 
-All automated checks pass on the current head. Outstanding work is
-inherently wallet/dashboard-bound. First human action: confirm the latest
-push produced a new Vercel production deploy, then walk
-`docs/manual-qa-checklist.md`.
+All automated checks pass on the current head. Production
+(`https://consentvault.vercel.app`) is now serving deploy
+`dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A` (created via CLI deploy at
+2026-05-20 19:30 ICT) and homepage HTML carries the redesigned copy
+(`Review creator policies`, `Create case`, `Read the policy`).
+Outstanding work is wallet/dashboard-bound; walk
+`docs/manual-qa-checklist.md` against the live URL.

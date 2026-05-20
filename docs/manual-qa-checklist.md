@@ -13,12 +13,13 @@ Production URL: `https://consentvault.vercel.app`
       `consentvault` project. Project Settings → Git should show the
       `ngh1105/ConsentVault` repository connected with `master` as the
       production branch.
-- [ ] **Latest production deploy matches the latest `master` commit.** At
-      audit time, `npx vercel ls --prod` showed the most recent production
-      deploy was 19 hours old despite a fresh push. If that gap persists,
-      either click **Redeploy** on the latest deployment in the dashboard
-      or push a trivial commit to confirm the Git integration triggers a
-      build.
+- [x] **Latest production deploy matches the latest `master` commit.**
+      Resolved 2026-05-20 by an explicit CLI deploy
+      (`npx vercel --prod`, id `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A`, alias
+      `https://consentvault.vercel.app`). Homepage HTML confirmed to
+      carry redesigned copy (`Review creator policies`, `Create case`,
+      `Read the policy`). The Git auto-deploy item above remains open
+      and only matters for future iterations.
 
 ## 2. Production environment variables
 
