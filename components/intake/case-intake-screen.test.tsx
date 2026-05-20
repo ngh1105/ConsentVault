@@ -44,11 +44,11 @@ describe("CaseIntakeScreen", () => {
     const dispatch = vi.fn();
     const user = userEvent.setup();
 
-    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseRouter.mockReturnValue({ push } as unknown as ReturnType<typeof useRouter>);
     mockedUseConsentVault.mockReturnValue({
       dispatch,
       policies: samplePolicies,
-    } as ReturnType<typeof useConsentVault>);
+    } as unknown as ReturnType<typeof useConsentVault>);
 
     render(<CaseIntakeScreen />);
 
@@ -103,11 +103,11 @@ describe("CaseIntakeScreen", () => {
     const dispatch = vi.fn();
     const user = userEvent.setup();
 
-    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseRouter.mockReturnValue({ push } as unknown as ReturnType<typeof useRouter>);
     mockedUseConsentVault.mockReturnValue({
       dispatch,
       policies: samplePolicies,
-    } as ReturnType<typeof useConsentVault>);
+    } as unknown as ReturnType<typeof useConsentVault>);
 
     render(<CaseIntakeScreen />);
 
@@ -135,11 +135,11 @@ describe("CaseIntakeScreen", () => {
     );
     const user = userEvent.setup();
 
-    mockedUseRouter.mockReturnValue({ push } as ReturnType<typeof useRouter>);
+    mockedUseRouter.mockReturnValue({ push } as unknown as ReturnType<typeof useRouter>);
     mockedUseConsentVault.mockReturnValue({
       dispatch,
       policies: samplePolicies,
-    } as ReturnType<typeof useConsentVault>);
+    } as unknown as ReturnType<typeof useConsentVault>);
 
     render(<CaseIntakeScreen />);
 

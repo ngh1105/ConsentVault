@@ -17,6 +17,8 @@ if (!allowedCase) {
   throw new Error("Expected seeded allowed benchmark case");
 }
 
+const allowedEvidenceIds = allowedCase.evidenceItems.map((item) => item.id);
+
 function createJudgment(
   verdict: ValidatorJudgment["verdict"],
   confidence: number,
@@ -28,7 +30,7 @@ function createJudgment(
     verdict,
     confidence,
     reasoning: `${verdict} with ${confidence} confidence`,
-    citedEvidenceIds: allowedCase.evidenceItems.map((item) => item.id),
+    citedEvidenceIds: allowedEvidenceIds,
   };
 }
 

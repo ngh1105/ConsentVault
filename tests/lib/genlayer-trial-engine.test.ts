@@ -176,12 +176,12 @@ describe("GenLayerTrialEngine.runTrial error paths", () => {
   });
 
   it("rejects when the receipt reports a non-success execution result", async () => {
-    const { readClient, walletClient } = makeMockClients();
+    const { readContract, walletClient } = makeMockClients();
     const readClientWithFailure = {
-      ...readClient,
       waitForTransactionReceipt: vi
         .fn()
         .mockResolvedValue({ txExecutionResultName: "FINISHED_WITH_ERROR" }),
+      readContract,
     } as never;
 
     const engine = new GenLayerTrialEngine({
@@ -199,8 +199,9 @@ describe("GenLayerTrialEngine.runTrial error paths", () => {
     const walletClient = {
       writeContract: vi.fn().mockResolvedValue(undefined),
     } as never;
+    const waitForTransactionReceipt = vi.fn();
     const readClient = {
-      waitForTransactionReceipt: vi.fn(),
+      waitForTransactionReceipt,
       readContract: vi.fn(),
     } as never;
 
@@ -213,7 +214,7 @@ describe("GenLayerTrialEngine.runTrial error paths", () => {
     await expect(
       engine.runTrial(buildInput({ wallet: undefined })),
     ).rejects.toThrow(/invalid transaction hash/i);
-    expect(readClient.waitForTransactionReceipt).not.toHaveBeenCalled();
+    expect(waitForTransactionReceipt).not.toHaveBeenCalled();
   });
 
   it("throws when writeContract returns a non-hex string", async () => {
