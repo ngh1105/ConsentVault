@@ -14,8 +14,16 @@ const navItems = [
 
 export function AppTopBar() {
   const mobileNavRef = React.useRef<HTMLDetailsElement>(null);
-  const closeMobileNav = () => {
+  const mobileNavSummaryRef = React.useRef<HTMLElement>(null);
+  const closeMobileNav = (focusTrigger = false) => {
     mobileNavRef.current?.removeAttribute("open");
+    if (focusTrigger) mobileNavSummaryRef.current?.focus();
+  };
+  const handleMobileNavKeyDown = (event: React.KeyboardEvent<HTMLDetailsElement>) => {
+    if (event.key === "Escape" && mobileNavRef.current?.open) {
+      event.preventDefault();
+      closeMobileNav(true);
+    }
   };
 
   return (
@@ -41,8 +49,9 @@ export function AppTopBar() {
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <WalletConnectButton />
-          <details ref={mobileNavRef} className="relative md:hidden">
+          <details ref={mobileNavRef} onKeyDown={handleMobileNavKeyDown} className="relative md:hidden">
             <summary
+              ref={mobileNavSummaryRef}
               aria-label="Open navigation"
               className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-card-elevated [&::-webkit-details-marker]:hidden"
             >
@@ -56,7 +65,7 @@ export function AppTopBar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={closeMobileNav}
+                  onClick={() => closeMobileNav()}
                   className="rounded-md px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:bg-card-elevated hover:text-foreground"
                 >
                   {item.label}
