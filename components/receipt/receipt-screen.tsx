@@ -72,14 +72,14 @@ export function ReceiptScreen({ caseId }: ReceiptScreenProps) {
                 <h2 className="text-lg font-semibold text-foreground">No receipt on file</h2>
               </div>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Open the mock trial route to generate deterministic validator judgments and save the final verdict into the archive.
+                Open the GenLayer trial route, connect a wallet, and finalize the validator run to save the verdict into the archive.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   href={`/cases/${consentCase.id}/trial`}
                   className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90"
                 >
-                  Run mock trial
+                  Run GenLayer trial
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <Link
@@ -98,7 +98,7 @@ export function ReceiptScreen({ caseId }: ReceiptScreenProps) {
               </p>
               <p className="mt-3 text-lg font-semibold text-foreground">Trial first, receipt second.</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Once the simulated validators agree on a verdict, this route becomes the final archive card and export surface.
+                Once the GenLayer validators agree on a verdict, this route becomes the final archive card and export surface.
               </p>
               <Link
                 href={`/cases/${consentCase.id}/trial`}

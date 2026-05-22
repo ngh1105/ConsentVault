@@ -26,7 +26,6 @@ Production URL: `https://consentvault.vercel.app`
 In Vercel → Project Settings → Environment Variables, the **Production**
 environment must include:
 
-- [ ] `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`
 - [ ] `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501`
 - [ ] `NEXT_PUBLIC_SITE_URL=https://consentvault.vercel.app`
 

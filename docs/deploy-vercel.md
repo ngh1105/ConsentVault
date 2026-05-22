@@ -26,12 +26,8 @@ hit the live contract):
 
 | Name                                | Value                                                        |
 | ----------------------------------- | ------------------------------------------------------------ |
-| `NEXT_PUBLIC_TRIAL_ENGINE`          | `genlayer`                                                   |
 | `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS` | `0x...` (contract address from `docs/deploy-contract.md`) |
 | `NEXT_PUBLIC_SITE_URL`              | `https://<your-project>.vercel.app` (after first deploy)     |
-
-> If you'd rather keep the public demo on the deterministic mock engine,
-> set `NEXT_PUBLIC_TRIAL_ENGINE=mock` and skip the contract address.
 
 ## 3. Trigger the first deploy
 

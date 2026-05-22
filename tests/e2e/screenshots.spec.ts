@@ -20,7 +20,7 @@ const captures = [
   {
     file: "06-trial.png",
     path: "/cases/case-voice-clone/trial",
-    waitFor: "Voice clone dispute",
+    waitFor: /Connect wallet to run the GenLayer trial|GenLayer contract not configured|Voice clone dispute/,
   },
   {
     file: "07-receipt.png",

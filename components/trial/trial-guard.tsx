@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useGenLayerWallet } from "@/components/providers/genlayer-wallet-provider";
-import { resolveTrialEngineKind } from "@/lib/trial-engine.factory";
 import { EmptyState } from "@/components/ui/empty-state";
 import { WalletConnectButton } from "@/components/wallet/wallet-connect-button";
 
@@ -17,13 +16,7 @@ function getConfiguredContractAddress(): string | null {
 }
 
 export function TrialGuard({ children }: { children: React.ReactNode }) {
-  const engineKind = resolveTrialEngineKind();
   const { address, status } = useGenLayerWallet();
-
-  if (engineKind !== "genlayer") {
-    return <>{children}</>;
-  }
-
   const contractAddress = getConfiguredContractAddress();
 
   if (!contractAddress) {

@@ -1,125 +1,105 @@
 # ConsentVault Demo Script
 
-A walkthrough you can read out loud while clicking through the demo. Pairs
-with the screenshots in `docs/screenshots/` (run `npm run demo:capture` to
-regenerate them).
+A concise walkthrough for presenting the live GenLayer-backed flow. Pair this
+with the screenshots in `docs/screenshots/`; regenerate them with
+`npm run demo:capture`.
 
-> **Engine selection:** the script works the same whether
-> `NEXT_PUBLIC_TRIAL_ENGINE=mock` (deterministic local trial) or `=genlayer`
-> (real contract on Studionet). For a public demo URL with the real engine,
-> see `docs/deploy-vercel.md` and `docs/deploy-contract.md`.
+## 0. Setup
 
----
+- Open the public Vercel URL or run locally with `npm run dev`.
+- Confirm `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS` points at the deployed
+  Studionet contract.
+- Unlock MetaMask and make sure Studionet can be added or selected.
+- Optional: keep GenLayer Studio open in another tab to show contract activity.
 
-## 0. Setup (off-stage)
+## 1. Dashboard (`/`)
 
-- Open the public Vercel URL **or** run locally with `npm run dev`.
-- Make sure MetaMask is unlocked and Studionet is added (the wallet provider
-  prompts for the network on first connect).
-- Optional but encouraged: open the GenLayer Studio in another tab so the
-  audience can see the deployed contract receiving traffic.
+> "ConsentVault is a verdict archive for AI content consent disputes. The
+> dashboard surfaces active cases, creator policies, receipt status, and the
+> current validator signal."
 
----
+- Highlight active cases, receipts issued, and validators online.
+- Open a seeded case from the case ledger.
+- Connect the wallet from the header and approve Studionet.
 
-## 1. Dashboard ledger (`/`)
+Screenshot: `01-dashboard.png`
 
-> "ConsentVault is a verdict-style archive for AI content consent disputes.
-> The dashboard surfaces the active docket: cases, policies, receipts."
-
-- Point at the **Active tribunal signal** banner — number of verdict-ready
-  cases.
-- Highlight the **Case ledger** with sample disputes already seeded.
-- Click **Connect wallet** in the header. MetaMask opens, signer is bound to
-  Studionet, the badge updates to the connected address + network name.
-
-📷 Screenshot: `01-dashboard.png`
-
-## 2. Creator policy (`/policy`)
+## 2. Creator Policy (`/policy`)
 
 > "Every dispute starts with a creator policy: allowed uses, blocked uses,
-> attribution and license rules. The policy builder turns that into the
-> consent contract that validators reason over."
+> attribution requirements, license rules, and jurisdiction notes."
 
-- Click **Policy** in the nav. Walk through the form fields and the
-  preview panel that mirrors the saved policy.
+- Show how the policy form maps creator intent into a structured review object.
+- Point out the live policy preview.
 
-📷 Screenshot: `02-policy.png`
+Screenshot: `02-policy.png`
 
-## 3. New case intake (`/cases/new`)
+## 3. New Case Intake (`/cases/new`)
 
-> "When a creator or moderator wants a verdict, they file a case. We collect
-> source, AI output, platform URLs, and notes — the evidence bundle that
-> validators see at trial."
+> "A case bundles source material, generated output, platform context, and
+> notes into the evidence package validators will inspect."
 
-- Show the live evidence preview as you fill the form.
-- Submit and let the app route to the new case overview.
+- Show the evidence preview and required fields.
+- Submit or open the draft case to continue the workflow.
 
-📷 Screenshot: `03-new-case.png`
+Screenshot: `03-new-case.png`
 
-## 4. Case overview (`/cases/[id]`)
+## 4. Case Overview (`/cases/[id]`)
 
-> "Each case becomes its own dossier: status, policy reference, evidence
-> count, and three workflow handoffs to evidence, trial, and receipt."
+> "Each dispute has a dossier with policy linkage, evidence count, status, and
+> handoffs to evidence review, trial, and receipt."
 
-📷 Screenshot: `04-case-overview.png`
+Screenshot: `04-case-overview.png`
 
-## 5. Evidence workspace (`/cases/[id]/evidence`)
+## 5. Evidence Workspace (`/cases/[id]/evidence`)
 
-> "Open the evidence workspace to compare original content with the AI
-> output side by side, see which policy clauses apply, and inspect the
-> evidence timeline."
+> "The evidence workspace compares source and AI output side by side, links the
+> relevant policy clauses, and keeps the timeline inspectable."
 
-📷 Screenshot: `05-evidence.png`
+Screenshot: `05-evidence.png`
 
-## 6. GenLayer trial (`/cases/[id]/trial`)
+## 6. GenLayer Trial (`/cases/[id]/trial`)
 
-> "Now the trial. With `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`, this triggers a
-> `run_trial` write transaction on the deployed Intelligent Contract. The
-> contract uses `gl.eq_principle.prompt_comparative` to gather three
-> validator judgments and aggregate them deterministically. With the mock
-> engine, the same UI runs the deterministic logic locally — same shape,
-> same receipt, no network call."
+> "The trial route submits `run_trial` to the deployed GenLayer Intelligent
+> Contract. The contract asks three validator personas for comparative
+> judgments, aggregates the result, and stores the verdict by case id."
 
-- Click **Re-run trial** to demonstrate the in-flight state (consensus
-  meter, run state badge), then the completed validator breakdown.
+- If MetaMask prompts, approve the write transaction.
+- Wait for finalization.
+- Review the consensus meter and validator breakdown.
 
-📷 Screenshot: `06-trial.png`
+Screenshot: `06-trial.png`
 
-## 7. Verdict receipt (`/cases/[id]/receipt`)
+## 7. Verdict Receipt (`/cases/[id]/receipt`)
 
-> "The trial output becomes a verdict receipt: final verdict, confidence
-> score, validator summary, cited evidence, recommended next action, and —
-> when the wallet is connected — the GenLayer issuer address + network."
+> "The finalized trial becomes a receipt: final verdict, confidence score,
+> validator reasoning, cited evidence, recommended action, and wallet issuer
+> metadata when a wallet signed the run."
 
-- Expand **Export receipt as JSON** to show the export flow (the same JSON
-  that external systems can ingest).
+- Expand "Export receipt as JSON" to show the portable output.
 
-📷 Screenshot: `07-receipt.png`
+Screenshot: `07-receipt.png`
 
-## 8. Adapter swap explanation (closer)
+## 8. Close
 
-> "ConsentVault keeps the demo path live with a deterministic mock engine
-> that mirrors the contract's verdict shape. Switching the public deploy
-> from mock to GenLayer is a single env var (`NEXT_PUBLIC_TRIAL_ENGINE`)
-> plus the deployed contract address. Everything downstream — receipts,
-> exports, validator UI — stays identical because the engine interface
-> agrees with the contract's JSON output."
+> "The product path is fully GenLayer-backed: policy and evidence are collected
+> in the app, the wallet signs the trial transaction, and the receipt UI reads
+> the contract's JSON output."
 
-- Optional: open `docs/research/genlayer-integration.md` to show the
-  end-to-end contract → JS surface.
+## Pre-Record Checklist
 
----
+- `npm run lint`
+- `npm run build`
+- `npm test`
+- `npm run test:e2e`
+- `npm run smoke:contract -- 0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501`
+- Studionet account funded and MetaMask ready
 
-## Pre-record checklist
+## Recovery
 
-- `npm run lint && npm run build && npm run test && npm run test:e2e`
-- `npm run demo:capture` — regenerates `docs/screenshots/`
-- Studionet account funded (💧 button) if running with `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`
-
-## Recovery if the GenLayer trial stalls during the demo
-
-- The trial screen surfaces a destructive banner with the underlying error.
-- Click **Re-run trial** to retry once the wallet/network is healthy.
-- If Studionet is down or the contract was reset, switch
-  `NEXT_PUBLIC_TRIAL_ENGINE=mock` (local) or back out to the dashboard;
-  the seeded demo data still produces a valid receipt.
+- If the trial stalls, retry once with **Re-run trial** after confirming the
+  wallet and network are healthy.
+- If Studionet was reset, redeploy the contract and update
+  `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS`.
+- If wallet access is unavailable, use the seeded dashboard and receipt routes
+  to present the read-only archive and export experience.

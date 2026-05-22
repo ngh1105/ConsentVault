@@ -31,12 +31,12 @@ b4d4185 chore(tests): fix typecheck regressions
 | Command | Result | Notes |
 | --- | --- | --- |
 | `npm run lint` | pass | eslint, no findings |
-| `npm test` | pass | Vitest, 22 files, 98 tests |
+| `npm test` | pass | Vitest, 21 files, 86 tests |
 | `npx tsc --noEmit` | pass | clean (no output) |
 | `npm run build` | pass | Next.js 15, 6 routes generated, OG edge route built |
-| `npx playwright test` | pass | 22 passed, 14 skipped (demo specs gated by `DEMO_CAPTURE=1`) |
+| `npx playwright test` | pass | 22 passed, 7 skipped (demo specs gated by `DEMO_CAPTURE=1`) |
 | `npx playwright test tests/e2e/meta.spec.ts` | pass | 2/2 (`og:*` meta + `/opengraph-image` PNG) |
-| `npm run demo:capture` | pass with override | Required `NEXT_PUBLIC_TRIAL_ENGINE=mock` shell override so the trial route renders the workspace instead of the `TrialGuard` empty state in the headless browser. `.env.local` was not modified. 4 screenshots updated: `02-policy.png`, `03-new-case.png`, `06-trial.png`, `07-receipt.png`. |
+| `npm run demo:capture` | pass | Captures the GenLayer-only product path. In headless browsers without MetaMask, the trial screenshot intentionally shows the wallet/contract guard state. |
 
 ## 4. Human-only checklist
 
@@ -54,7 +54,6 @@ the funded `shieldtest` Studionet account — see
       Settings → Git is wired so future `master` pushes deploy without
       manual intervention.
 - [ ] **Production env vars set** in Vercel project settings:
-  - `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`
   - `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x…`
   - `NEXT_PUBLIC_SITE_URL=https://<deploy>.vercel.app`
 - [ ] **MetaMask connects to Studionet (chain id `61999`)** — header shows
@@ -76,13 +75,8 @@ the funded `shieldtest` Studionet account — see
 - **No GitHub Actions workflows configured** — `gh run list --limit 5`
   returns empty. CI signal is local verification only.
 - **0 open pull requests, 0 open issues** at audit time.
-- **Demo screenshots refreshed** — committed at `29b96c3`. They reflect the
-  modern redesign and the mock-engine trial workspace.
-- **Trial screenshot capture requires a mock-engine override** — when
-  `.env.local` is set to `genlayer`, the headless browser cannot satisfy
-  the wallet guard, so screenshot regeneration must inject
-  `NEXT_PUBLIC_TRIAL_ENGINE=mock` for the run. This is a property of the
-  capture script, not a runtime bug.
+- **Demo screenshots refreshed** — they reflect the modern redesign and the
+  GenLayer-only trial guard behavior in headless capture.
 - **Vercel auto-deploy lag (observed concern, partially resolved)** — at
   audit time, the most recent production deployment on
   `consentvault.vercel.app` was 19 hours old despite a fresh push to

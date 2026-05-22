@@ -40,7 +40,6 @@ The CLI prints the deployed contract address — copy it.
 Create `.env.local` (gitignored) at the repo root:
 
 ```
-NEXT_PUBLIC_TRIAL_ENGINE=genlayer
 NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0xYOUR_DEPLOYED_ADDRESS
 ```
 

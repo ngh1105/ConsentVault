@@ -1,79 +1,62 @@
-# ConsentVaultTrial — GenLayer Intelligent Contract
+# ConsentVaultTrial GenLayer Contract
 
-Intelligent Contract that powers ConsentVault's verdict trial. The frontend
-sends a serialized `case` + `policy` bundle, the contract runs three validator
-personas via `gl.eq_principle.prompt_comparative` and aggregates the
-judgments into a final verdict + score that mirrors `lib/verdict.ts`.
+Intelligent Contract that powers ConsentVault's live verdict trial. The
+frontend sends serialized `case` and `policy` payloads, the contract runs three
+validator personas through `gl.eq_principle.prompt_comparative`, aggregates the
+judgments, and stores one JSON result per case id.
 
 ## Files
 
-- `main.py` — the deployment-ready contract. Single file, all logic inlined
-  because GenVM contracts are constrained to one file.
-- `aggregate.py` — pure-Python mirror of the deterministic aggregation logic
-  used by pytest. Keep in sync with `main.py` whenever the verdict rules
-  change.
-- `test_aggregate.py` — pytest covering priority + tie-breaking + scoring +
-  copy templates. No GenLayer SDK or LLM access required.
-- `requirements-dev.txt` — pytest only.
+- `main.py`: deployment-ready GenLayer contract. Logic is inlined because GenVM
+  contracts are constrained to one file.
+- `aggregate.py`: pure-Python mirror of deterministic aggregation logic used by
+  pytest.
+- `test_aggregate.py`: pytest coverage for priority, tie-breaking, scoring,
+  copy templates, and `main.py` drift checks.
+- `requirements-dev.txt`: pytest dependency for local contract tests.
 
-## Running tests
+## Run Tests
 
-```bash
+```powershell
 cd contracts/consent_vault_trial
-python -m venv .venv
-.venv\Scripts\activate     # PowerShell on Windows
-# or: source .venv/bin/activate on macOS / Linux
-pip install -r requirements-dev.txt
-pytest
+py -3 -m pytest
 ```
 
-## Deploying with `genlayer-cli`
+## Deploy With `genlayer-cli`
 
-Pre-requisites:
-- `genlayer-cli` installed (`npm install -g genlayer-cli`).
-- A funded Studionet account — open https://studio.genlayer.com, click the 💧
-  faucet button to mint test GEN.
+Prerequisites:
+
+- `genlayer-cli` installed: `npm install -g genlayer-cli`
+- A funded Studionet account from https://studio.genlayer.com
 
 ```bash
-genlayer init                  # one-time CLI setup
+genlayer init
 genlayer network set studionet
-genlayer account import        # import the account that holds the test GEN
-                               # (or: genlayer account use <existing-alias>)
-
+genlayer account import
 genlayer deploy --contract contracts/consent_vault_trial/main.py
-# Output prints the deployed contract address.
 ```
 
-Copy the printed contract address into `.env.local`:
+Copy the deployed address into `.env.local`:
 
-```
-NEXT_PUBLIC_TRIAL_ENGINE=genlayer
+```text
 NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0xDEPLOYEDADDRESSHERE
 ```
 
-## Smoke calling the contract
+## Smoke The Contract
 
-After deploy, sanity-check `run_trial` with a sample case:
+After deployment, verify the read path from the app's SDK layer:
 
 ```bash
-genlayer write \
-  --address 0xDEPLOYEDADDRESSHERE \
-  --function run_trial \
-  --args '["{\"id\":\"smoke\",\"title\":\"Smoke\",\"evidenceItems\":[]}", "{\"creatorName\":\"Smoke\",\"allowedUses\":[],\"blockedUses\":[]}"]'
-
-genlayer call \
-  --address 0xDEPLOYEDADDRESSHERE \
-  --function get_result_by_case \
-  --args '["smoke"]'
+npm run smoke:contract -- 0xDEPLOYEDADDRESSHERE
 ```
 
-The second call returns a JSON string with `judgments`, `finalVerdict`,
-`score`, `summary`, and `recommendedAction`.
+This calls `get_result_by_case("__smoke__")`. A fresh contract returns an empty
+string, confirming the contract is reachable and the ABI matches the frontend.
 
-## Storage shape
+## Trial Shape
 
-`last_result_by_case: TreeMap[str, str]` — one persisted result per case id.
-The returned JSON object has this shape:
+`run_trial(case_json, policy_json)` writes a finalized result into
+`last_result_by_case`. `get_result_by_case(case_id)` returns a JSON string:
 
 ```json
 {
@@ -85,8 +68,7 @@ The returned JSON object has this shape:
       "confidence": 0.94,
       "reasoning": "...",
       "citedEvidenceIds": ["ev-imp-source", "ev-imp-output"]
-    },
-    ...
+    }
   ],
   "finalVerdict": "Impersonation Risk",
   "score": 92,
@@ -98,19 +80,12 @@ The returned JSON object has this shape:
 }
 ```
 
-The frontend wraps this with case timestamp + connected-wallet metadata to
+The frontend wraps this with case timestamp and connected-wallet metadata to
 build the final `VerdictReceipt`.
 
-## Drift policy
+## Drift Policy
 
-The TypeScript `lib/mock-trial-engine.ts` and the Python contract aggregator
-(`main.py` + `aggregate.py`) are independent implementations.
-
-- The mock engine is the offline demo fixture, served when
-  `NEXT_PUBLIC_TRIAL_ENGINE` is unset.
-- The contract is canonical when `NEXT_PUBLIC_TRIAL_ENGINE=genlayer`.
-- Receipt JSON may differ between the two paths — this is intentional for the
-  hybrid MVP.
-- The parity test in `test_aggregate.py` verifies only that `main.py` and
-  `aggregate.py` agree on verdict copy. TS ↔ Python drift is allowed and
-  re-evaluated after the demo.
+The GenLayer contract is the canonical trial engine. The pure-Python
+`aggregate.py` mirror exists only for pytest coverage of deterministic
+aggregation, copy, and scoring rules. Keep `main.py`, `aggregate.py`, and
+`test_aggregate.py` in sync whenever verdict aggregation changes.

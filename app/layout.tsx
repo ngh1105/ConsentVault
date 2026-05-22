@@ -57,7 +57,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={`${fontSans.variable} ${fontMono.variable}`}
+    >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ThemeProvider>
           <ConsentVaultProvider>

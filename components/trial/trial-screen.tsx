@@ -127,13 +127,13 @@ function TrialWorkspace({ consentCase, policy }: { consentCase: ConsentCase; pol
     <div className="space-y-6">
       <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          Simulated trial
+          GenLayer trial
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {consentCase.title}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-          Three fixed validators inspect the archived record, compare it against the creator policy, and produce a consensus receipt.
+          Three GenLayer validator personas inspect the archived record, compare it against the creator policy, and produce a consensus receipt.
         </p>
 
         {errorMessage ? (
