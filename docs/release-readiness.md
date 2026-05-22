@@ -1,109 +1,90 @@
 # Release Readiness
 
-Generated 2026-05-20 from a full local audit on Windows 11 + Node 22.
+Generated 2026-05-22 from a full local audit on Windows 11 + Node 22.
 
-## 1. Current head
+## 1. Current Head
 
-- Commit: `be7a80c` docs: add release readiness report
+- Commit: `1641bd9` refactor: require GenLayer trial engine
 - Branch: `master`
-- Working tree: clean
+- Working tree: clean at the time of deployment verification
 
 Recent commits on this branch:
 
-```
-be7a80c docs: add release readiness report
-29b96c3 docs: refresh demo screenshots
-64b2605 docs: align receipt JSON copy with Export disclosure UI
-bd51001 chore(e2e): align consentvault-flow with redesigned UI
-c405d71 chore(e2e): refresh a11y keyboard assertions
-b4d4185 chore(tests): fix typecheck regressions
-5adce53 chore(a11y): polish keyboard interactions
+```text
+1641bd9 refactor: require GenLayer trial engine
+db5f848 docs(release): note Studionet seed completion in readiness report
+bbe3fda docs(contract): record Studionet seed receipts
 ```
 
-## 2. Repo sync status
+## 2. Repo And Deploy Status
 
-- Local `master` is **in sync with `origin/master`** (push completed
-  2026-05-20 ~11:26 UTC).
-- Next signal comes from Vercel; see §5 for the auto-deploy concern.
+- Local `master` is in sync with `origin/master` after pushing `1641bd9`.
+- Vercel Git auto-deploy still appears unreliable. The production alias was
+  refreshed with an explicit CLI deploy.
+- Production URL: `https://consentvault.vercel.app`
+- Production deploy id: `dpl_FZPCDLxwLSMbG3hVuWup42oA3sLh`
+- Deployment URL: `https://consentvault-n6cz89my1-ngh1105s-projects.vercel.app`
+- Created: 2026-05-22 22:01 ICT
 
-## 3. Automated verification
+## 3. Automated Verification
 
 | Command | Result | Notes |
 | --- | --- | --- |
 | `npm run lint` | pass | eslint, no findings |
-| `npm test` | pass | Vitest, 21 files, 86 tests |
-| `npx tsc --noEmit` | pass | clean (no output) |
+| `npx tsc --noEmit` | pass | clean after `next build` regenerated `.next/types` |
 | `npm run build` | pass | Next.js 15, 6 routes generated, OG edge route built |
-| `npx playwright test` | pass | 22 passed, 7 skipped (demo specs gated by `DEMO_CAPTURE=1`) |
-| `npx playwright test tests/e2e/meta.spec.ts` | pass | 2/2 (`og:*` meta + `/opengraph-image` PNG) |
-| `npm run demo:capture` | pass | Captures the GenLayer-only product path. In headless browsers without MetaMask, the trial screenshot intentionally shows the wallet/contract guard state. |
+| `npm test` | pass | Vitest, 21 files, 86 tests |
+| `npx playwright test` | pass | 22 passed, 7 skipped screenshot specs gated by `DEMO_CAPTURE=1` |
+| `py -3 -m pytest` | pass | Contract aggregation tests, 27 passed |
+| `npm run demo:capture` | pass | Captures the GenLayer-only product path; headless trial screenshot shows the wallet guard |
+| `npm run smoke:contract -- 0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` | pass | Contract reachable; smoke case returns empty as expected |
 
-## 4. Human-only checklist
+## 4. Live Smoke Checks
 
-These cannot be exercised from a regular CI run because they need a
-human at MetaMask plus Vercel project owner access. Production
-(`https://consentvault.vercel.app`) is serving deploy
-`dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A` (created 2026-05-20 19:30 ICT) and
-the deployed contract `0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` has
-already been smoke-seeded with two finalized `run_trial` executions via
-the funded `shieldtest` Studionet account — see
-`docs/contract-seeding.md` for tx hashes. Start from the wallet flow.
+All checked after the production CLI deploy:
 
-- [ ] **Vercel Git auto-deploy connected** — the CLI deploy worked, but
-      the previous push did not auto-trigger a build. Confirm Project
-      Settings → Git is wired so future `master` pushes deploy without
-      manual intervention.
-- [ ] **Production env vars set** in Vercel project settings:
-  - `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x…`
-  - `NEXT_PUBLIC_SITE_URL=https://<deploy>.vercel.app`
-- [ ] **MetaMask connects to Studionet (chain id `61999`)** — header shows
-      truncated address + `Genlayer Studio Network`.
-- [ ] **`run_trial` write transaction** — open `/cases/case-voice-clone/trial`,
-      MetaMask prompts for a write tx, approve and wait for `FINALIZED`.
-- [ ] **Receipt route shows GenLayer issuer** — verdict banner renders, the
-      metadata grid includes the issuer address row.
-- [ ] **Export receipt as JSON includes wallet block** — expand the
-      `<details>` disclosure on the receipt route; JSON contains a `wallet`
-      object with `issuerAddress`, `chainId: 61999`, `networkName`, and
-      `issuedVia: "genlayer-js"`.
-- [ ] **OG preview** — paste the public URL into LinkedIn, X, or
-      https://www.opengraph.xyz/. The 1200×630 archive-style PNG renders
-      with `Studionet · Chain id 61999` in the footer.
+| URL | Result |
+| --- | --- |
+| `/` | 200 HTML |
+| `/policy` | 200 HTML |
+| `/cases/new` | 200 HTML |
+| `/cases/case-voice-clone/trial` | 200 HTML; shows `Connect wallet to run the GenLayer trial` without MetaMask |
+| `/cases/case-voice-clone/receipt` | 200 HTML |
+| `/opengraph-image` | 200 PNG |
 
-## 5. Known non-blockers and observed concerns
+Homepage HTML includes `Review creator policies` and `Connect wallet`.
+Open Graph metadata includes `ConsentVault - AI consent verdict archive`.
 
-- **No GitHub Actions workflows configured** — `gh run list --limit 5`
-  returns empty. CI signal is local verification only.
-- **0 open pull requests, 0 open issues** at audit time.
-- **Demo screenshots refreshed** — they reflect the modern redesign and the
-  GenLayer-only trial guard behavior in headless capture.
-- **Vercel auto-deploy lag (observed concern, partially resolved)** — at
-  audit time, the most recent production deployment on
-  `consentvault.vercel.app` was 19 hours old despite a fresh push to
-  `origin/master`. Pushing the next commit (`26c22a0`) also did not
-  trigger a build within the observation window. The fresh production
-  surface was restored by an explicit CLI deploy
-  (`npx vercel --prod`, deploy id `dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A`,
-  alias `https://consentvault.vercel.app`). The underlying Git-integration
-  question is still unverified — confirm via Project Settings → Git in
-  the Vercel dashboard before relying on push-to-deploy for further
-  iterations.
-- **Studionet ephemerality** — Studio resets wipe contract state. If the
-  public deploy starts showing empty receipts, redeploy the contract per
-  `docs/deploy-contract.md` and update `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS`.
+## 5. Human-Only QA
 
-## 6. Final verdict
+These still require MetaMask, a funded Studionet account, and Vercel project
+owner access:
 
-**READY FOR HUMAN METAMASK QA.**
+- [ ] Confirm Project Settings -> Git is wired so future `master` pushes deploy
+      automatically.
+- [ ] Confirm production env vars:
+  - `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS=0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501`
+  - `NEXT_PUBLIC_SITE_URL=https://consentvault.vercel.app`
+- [ ] Connect MetaMask to Studionet, chain id `61999`.
+- [ ] Run a `run_trial` transaction from `/cases/case-voice-clone/trial`.
+- [ ] Confirm the receipt metadata includes the connected GenLayer issuer.
+- [ ] Confirm exported receipt JSON includes the `wallet` block.
+- [ ] Confirm the OG preview renders in a social preview tool.
 
-All automated checks pass on the current head. Production
-(`https://consentvault.vercel.app`) is serving deploy
-`dpl_6aBbtSTZ198aLTAwYqbqxPvFVt2A` (created via CLI deploy at
-2026-05-20 19:30 ICT) and homepage HTML carries the redesigned copy
-(`Review creator policies`, `Create case`, `Read the policy`). The
-deployed contract `0x1a0f5fBF06fE00627176C0Fe26e64a7a008c9501` has
-been smoke-seeded with two FINALIZED `run_trial` cases
-(`seed-case-voice-clone`, `seed-case-dataset-consent`) — see
-`docs/contract-seeding.md` for tx hashes and verification.
-Outstanding work is wallet/dashboard-bound; walk
-`docs/manual-qa-checklist.md` against the live URL.
+## 6. Known Non-Blockers
+
+- No GitHub Actions workflows are configured; CI signal is local verification.
+- Vercel Git auto-deploy lag remains an operational concern. Production is
+  current because of the explicit CLI deploy above.
+- Studionet state is ephemeral. If the public deploy starts showing empty
+  receipts for previously seeded cases, redeploy the contract and update
+  `NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS`.
+
+## 7. Final Verdict
+
+**READY FOR FINAL HUMAN METAMASK QA.**
+
+The codebase is GenLayer-only, production is serving the latest pushed
+application surface, automated checks pass, live route smoke checks pass, and
+the deployed contract is reachable. The remaining work is the signer-bound
+MetaMask transaction walkthrough.
